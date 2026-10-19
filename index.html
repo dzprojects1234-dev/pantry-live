@@ -1693,8 +1693,8 @@
             
             // Try to load from API first
             let apiData = null;
-            if (isOnline && authToken) {
-                apiData = await loadFromApi();
+            if (isOnline) {  // Buang syarat authToken
+            apiData = await loadFromApi();
             }
             
             if (apiData) {
