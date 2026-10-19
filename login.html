@@ -225,6 +225,8 @@
                 };
                 
                 localStorage.setItem('inventory_login', JSON.stringify(loginData));
+                localStorage.setItem('pantryAuthToken', 'admin'); // Token sakti
+                localStorage.setItem('pantryAdminMode', 'true');  // Terus jadi Admin
                 window.location.href = 'index.html';
             } else {
                 alert('Invalid username or password');
