@@ -246,6 +246,7 @@
                 // Show error if password does not match
                 alert('Invalid username or password');
             }
+        } // <--- THIS IS THE MISSING CURLY BRACE THAT CAUSED THE ERROR
 
         // Event listeners
         document.getElementById('loginBtn').addEventListener('click', login);
