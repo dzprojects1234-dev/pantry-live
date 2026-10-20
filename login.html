@@ -219,28 +219,33 @@
             if (VALID_USERS[username] === hashedPassword) {
                 const loginData = {
                     user: username,
-                    expires: Date.now() + (7 * 24 * 60 * 60 * 1000), // 7 days
+                    expires: Date.now() + (7 * 24 * 60 * 60 * 1000), // Session valid for 7 days
                     timestamp: new Date().toISOString()
                 };
                 
-                localStorage.clear(); // Clear all previous session data
-                localStorage.setItem('inventory_login', JSON.stringify(loginData));
-                localStorage.setItem('pantryAuthToken', 'admin'); // Grant admin authentication token
-                localStorage.setItem('pantryAdminMode', 'true');  // Enable Admin mode
+                // Clear old session data to prevent conflicts
+                localStorage.clear(); 
                 
-                // Redirect user to their respective portal based on username
+                // Set new session and admin tokens
+                localStorage.setItem('inventory_login', JSON.stringify(loginData));
+                localStorage.setItem('pantryAuthToken', 'admin'); 
+                localStorage.setItem('pantryAdminMode', 'true');  
+                
+                // ==========================================
+                // ROUTING LOGIC: Direct users to their portal
+                // ==========================================
                 if (username === 'salleh') {
-                    window.location.href = 'aliman.html'; // Redirect to Al-Iman portal
+                    window.location.href = 'aliman.html'; // Portal for Masjid Al-Iman
+                } else if (username === 'test') {
+                    window.location.href = 'test.html';   // Portal for Testing
                 } else {
-                if (username === 'test') {
-                    window.location.href = 'test.html'; // Redirect to test portal
-                } else {
-                    window.location.href = 'index.html';  // Redirect to Al-Khair portal
+                    window.location.href = 'index.html';  // Default Portal (Masjid Al-Khair)
                 }
+                
             } else {
+                // Show error if password does not match
                 alert('Invalid username or password');
             }
-        }
 
         // Event listeners
         document.getElementById('loginBtn').addEventListener('click', login);
