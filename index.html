@@ -2197,19 +2197,8 @@
             // Alerts
             checkAlertsBtn.addEventListener('click', checkAllAlerts);
             
-            // Admin button
-            adminBtn.addEventListener('click', () => {
-                // If already authenticated with API, just toggle mode
-                if (authToken && isOnline) {
-                    isAdminMode = !isAdminMode;
-                    toggleAdminMode(isAdminMode);
-                    showAlert(isAdminMode ? 'Admin mode activated' : 'Admin mode deactivated', true);
-                } else {
-                    // Show login modal for API authentication
-                    loginModal.classList.add('active');
-                }
-            });
-                        // Logout button
+            
+             // Logout button
             if (logoutBtn) {
                 logoutBtn.addEventListener('click', () => {
                     if (confirm('Adakah anda pasti mahu log keluar?')) {
