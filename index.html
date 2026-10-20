@@ -1139,8 +1139,9 @@
                 <button class="theme-toggle" id="themeToggle" title="Toggle Dark/Light Mode">
                     <i class="fas fa-moon"></i>
                 </button>
-                <button class="admin-btn" id="adminBtn" title="Admin Login">
-                    <i class="fas fa-user-shield"></i>
+                <button class="admin-btn" id="logoutBtn" title="Logout" style="background: rgba(239, 
+                68, 68, 0.8); margin-left: 5px;">
+                <i class="fas fa-sign-out-alt"></i>
                 </button>
             </div>
             
@@ -1444,6 +1445,7 @@
         const locationText = document.getElementById('locationText');
         const themeToggle = document.getElementById('themeToggle');
         const adminBtn = document.getElementById('adminBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
         const loginModal = document.getElementById('loginModal');
         const closeLoginModal = document.getElementById('closeLoginModal');
         const cancelLogin = document.getElementById('cancelLogin');
@@ -2207,6 +2209,15 @@
                     loginModal.classList.add('active');
                 }
             });
+                        // Logout button
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', () => {
+                    if (confirm('Adakah anda pasti mahu log keluar?')) {
+                        localStorage.clear();
+                        window.location.href = 'login.html';
+                    }
+                });
+            }
             
             // Login modal
             closeLoginModal.addEventListener('click', () => {
