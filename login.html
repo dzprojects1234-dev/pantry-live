@@ -142,7 +142,7 @@
 </head>
 <body>
     <div class="login-container">
-        <h1><i class="fas fa-mosque"></i> Masjid Al-Khair</h1>
+        <h1><i class="fas fa-mosque"></i> Al-Masjid</h1>
         <p class="subtitle">Inventory & Stock Management</p>
         
         <div class="input-group">
@@ -161,7 +161,7 @@
         
         <div class="info">
             <p><i class="fas fa-shield-alt"></i> Your data is stored securely</p>
-            <p><i class="fas fa-users"></i> Valid users: admin, ops</p>
+            <p><i class="fas fa-users"></i> Authorized users only</p>
         </div>
     </div>
     
@@ -174,9 +174,9 @@
         // 4. Paste it below where it says "PASTE_HASH_HERE"
         
         const VALID_USERS = {
-        "noja1": "0b1d4a4de2782999b234f83c8b09efb0bfdf08c3db662e06ff119778e18b0121", // Al-Khair
-        "noja2": "ea9c848a278ebd8271f7d81b3ad17b5e01313fb8546a0bea29a4dab958e17c07", // Al-Khair (backup)
-        "salleh": "33f2691f3587aafa2506ec794faf61d284ef1be017fb80c2f5a3e226a23fb98f" // Al-Iman
+            "noja1": "0b1d4a4de2782999b234f83c8b09efb0bfdf08c3db662e06ff119778e18b0121", // Al-Khair
+            "noja2": "ea9c848a278ebd8271f7d81b3ad17b5e01313fb8546a0bea29a4dab958e17c07", // Al-Khair (backup)
+            "salleh": "33f2691f3587aafa2506ec794faf61d284ef1be017fb80c2f5a3e226a23fb98f" // Al-Iman
         };
 
         // Function to hash password using SHA-256
@@ -222,16 +222,17 @@
                     timestamp: new Date().toISOString()
                 };
                 
-                localStorage.clear(); // Buang semua sesi lama
+                localStorage.clear(); // Clear all previous session data
                 localStorage.setItem('inventory_login', JSON.stringify(loginData));
-                localStorage.setItem('pantryAuthToken', 'admin'); // Token sakti
-                localStorage.setItem('pantryAdminMode', 'true');  // Terus jadi Admin
-                // Semak jika user adalah "salleh", pergi ke pintu Al-Iman
+                localStorage.setItem('pantryAuthToken', 'admin'); // Grant admin authentication token
+                localStorage.setItem('pantryAdminMode', 'true');  // Enable Admin mode
+                
+                // Redirect user to their respective portal based on username
                 if (username === 'salleh') {
-                   window.location.href = 'aliman.html';
-            } else {
-                window.location.href = 'index.html'; // Pintu Al-Khair (Encik Rafi)
-            }
+                    window.location.href = 'aliman.html'; // Redirect to Al-Iman portal
+                } else {
+                    window.location.href = 'index.html';  // Redirect to Al-Khair portal
+                }
             } else {
                 alert('Invalid username or password');
             }
