@@ -1252,8 +1252,12 @@
             return apiSaved || !isOnline;
         }
         
-        function renderStockList() {
+             function renderStockList() {
             stockList.innerHTML = '';
+            if (!currentItems || currentItems.length === 0) {
+                stockList.innerHTML = '<li style="text-align:center; padding: 20px; color: var(--text-muted);">No items found for this mosque yet.</li>';
+                return;
+            }
             currentItems.forEach(item => {
                 const listItem = document.createElement('li');
                 listItem.className = 'stock-item';
@@ -1973,7 +1977,7 @@
                     </style>
                 </head>
                 <body>
-                    <h1>Masjid Al-Iman Pantry - Stock Report</h1>
+                    <h1>Masjid Al-Ujian Pantry - Stock Report</h1>
                     <div class="report-info">
                         <p><strong>Generated:</strong> ${formattedDate}</p>
                         <p><strong>Location:</strong> Masjid Al-Iman Pantry - Stock Room</p>
