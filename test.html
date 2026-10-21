@@ -1252,12 +1252,13 @@
             return apiSaved || !isOnline;
         }
         
-             function renderStockList() {
+            function renderStockList() {
             stockList.innerHTML = '';
             if (!currentItems || currentItems.length === 0) {
                 stockList.innerHTML = '<li style="text-align:center; padding: 20px; color: var(--text-muted);">No items found for this mosque yet.</li>';
                 return;
             }
+            currentItems.forEach(item => {
             currentItems.forEach(item => {
                 const listItem = document.createElement('li');
                 listItem.className = 'stock-item';
