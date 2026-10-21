@@ -1165,7 +1165,6 @@
                 }
                 console.log('Data loaded from local storage');
                 
-                // ONLY run this if we are using offline/default data
                 initialItems.forEach(initialItem => {
                     const exists = currentItems.find(item => item.id === initialItem.id);
                     if (!exists) {
@@ -2032,7 +2031,7 @@
         
         function printToCSV() {
             let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "LEVEL 1 PANTRY STOCK REPORT\n";
+            csvContent += "MASJID AL-IMAN PANTRY STOCK REPORT\n";
             csvContent += `Generated: ${formatDateTime(new Date())}\n`;
             csvContent += "Location: Masjid Al-Iman Pantry - Stock Room\n\n";
             csvContent += "CURRENT STOCK LEVELS\n";
