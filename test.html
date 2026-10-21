@@ -853,7 +853,7 @@
         </div>
         
         <div class="print-footer">
-            <p>Masjid Al-Iman Pantry Stock Management System | Page <span class="pageNumber"></span></p>
+            <p>Masjid Al-Ujian Pantry Stock Management System | Page <span class="pageNumber"></span></p>
             <p>Report generated on <span id="printFooterDate"></span> | For official use only</p>
         </div>
     </div>
@@ -1252,13 +1252,12 @@
             return apiSaved || !isOnline;
         }
         
-            function renderStockList() {
+        function renderStockList() {
             stockList.innerHTML = '';
             if (!currentItems || currentItems.length === 0) {
                 stockList.innerHTML = '<li style="text-align:center; padding: 20px; color: var(--text-muted);">No items found for this mosque yet.</li>';
                 return;
             }
-            currentItems.forEach(item => {
             currentItems.forEach(item => {
                 const listItem = document.createElement('li');
                 listItem.className = 'stock-item';
@@ -1269,8 +1268,9 @@
                 else if (item.quantity <= item.min_quantity) { status = 'status-critical'; statusText = 'Low'; }
                 else if (item.quantity <= item.min_quantity * 1.5) { status = 'status-low'; statusText = 'Monitor'; }
                 
-                const maxValue = (item.name === "Susu Pekat" || item.name === "Susu Cair") ? "" : (item.max_quantity || 100);
-                const maxAttr = (item.name === "Susu Pekat" || item.name === "Susu Cair") ? "" : `max="${maxValue}"`;
+                // We removed the strict Susu Pekat check here to avoid bugs
+                const maxValue = item.max_quantity || 100;
+                const maxAttr = `max="${maxValue}"`;
                 
                 listItem.innerHTML = `
                     <div class="item-info">
@@ -1740,8 +1740,8 @@
             });
         }
         
-            function updateCharts() {
-            if (!currentItems || currentItems.length === 0) return; // <--- ADD THIS LINE
+        function updateCharts() {
+            if (!currentItems || currentItems.length === 0) return;
             const selectedItemId = parseInt(itemSelect.value) || currentItems[0].id;
             updateWeeklyChart(selectedItemId);
             updateDistributionChart();
@@ -1958,7 +1958,7 @@
                 <!DOCTYPE html>
                 <html>
                 <head>
-                    <title>Masjid Al-Iman Pantry Stock Report - ${currentDate.toISOString().split('T')[0]}</title>
+                    <title>Masjid Al-Ujian Pantry Stock Report - ${currentDate.toISOString().split('T')[0]}</title>
                     <style>
                         body { font-family: Arial, sans-serif; margin: 20px; }
                         h1 { color: #333; text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px; }
@@ -1981,7 +1981,7 @@
                     <h1>Masjid Al-Ujian Pantry - Stock Report</h1>
                     <div class="report-info">
                         <p><strong>Generated:</strong> ${formattedDate}</p>
-                        <p><strong>Location:</strong> Masjid Al-Iman Pantry - Stock Room</p>
+                        <p><strong>Location:</strong> Masjid Al-Ujian Pantry - Stock Room</p>
                         <p><strong>Total Items Tracked:</strong> ${currentItems.length}</p>
                     </div>
                     
@@ -2020,7 +2020,7 @@
                     ` : '<p>No recent stock movements recorded.</p>'}
                     
                     <div class="footer">
-                        <p>Masjid Al-Iman Pantry Stock Management System - Report generated on ${formattedDate}</p>
+                        <p>Masjid Al-Ujian Pantry Stock Management System - Report generated on ${formattedDate}</p>
                         <p>For any discrepancies, please contact the pantry administrator.</p>
                     </div>
                     
@@ -2037,9 +2037,9 @@
         
         function printToCSV() {
             let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "MASJID AL-IMAN PANTRY STOCK REPORT\n";
+            csvContent += "MASJID AL-UJIAN PANTRY STOCK REPORT\n";
             csvContent += `Generated: ${formatDateTime(new Date())}\n`;
-            csvContent += "Location: Masjid Al-Iman Pantry - Stock Room\n\n";
+            csvContent += "Location: Masjid Al-Ujian Pantry - Stock Room\n\n";
             csvContent += "CURRENT STOCK LEVELS\n";
             csvContent += "No,Item,Unit,Current Quantity,Min Quantity,Max Quantity,Status,Last Updated\n";
             currentItems.forEach((item, index) => {
