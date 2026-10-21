@@ -1044,7 +1044,7 @@
                     version: '2.0'
                 };
                 
-                const response = await fetchFromApi('/save', {
+                const response = await fetchFromApi('/save?mosque=al-khair&location=pantry', {
                     method: 'POST',
                     body: JSON.stringify(dataToSave)
                 });
@@ -1058,7 +1058,7 @@
         async function loadFromApi() {
             if (!isOnline) return null;
             try {
-                const data = await fetchFromApi('/load');
+                const data = await fetchFromApi('/load?mosque=al-khair&location=pantry');
                 if (data && data.items) {
                     return {
                         items: data.items,
