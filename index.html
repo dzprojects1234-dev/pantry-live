@@ -890,7 +890,6 @@
             </form>
         </div>
     </div>
-
     <script>
         const API_BASE = 'https://frosty-frog-9bafpantry.dz-projects1234.workers.dev/api/pantry';
         const DEFAULT_USERNAME = "admin";
@@ -1165,14 +1164,15 @@
                     initializeDefaultData();
                 }
                 console.log('Data loaded from local storage');
+                
+                // ONLY run this if we are using offline/default data
+                initialItems.forEach(initialItem => {
+                    const exists = currentItems.find(item => item.id === initialItem.id);
+                    if (!exists) {
+                        currentItems.push({...initialItem});
+                    }
+                });
             }
-            
-            initialItems.forEach(initialItem => {
-                const exists = currentItems.find(item => item.id === initialItem.id);
-                if (!exists) {
-                    currentItems.push({...initialItem});
-                }
-            });
             
             currentItems.sort((a, b) => a.id - b.id);
             
