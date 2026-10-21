@@ -894,6 +894,17 @@
     </div>
     <script>
         const API_BASE = 'https://frosty-frog-9bafpantry.dz-projects1234.workers.dev/api/pantry';
+        // --- LOCATION SWITCHER (Step 2) ---
+        // Reads the URL parameter ?location=... (defaults to "pantry" if missing)
+        function getCurrentLocation() {
+            const params = new URLSearchParams(window.location.search);
+            const loc = params.get('location');
+            return (loc === 'basement') ? 'basement' : 'pantry';
+        }
+
+        const CURRENT_LOCATION = getCurrentLocation();
+        console.log('📍 Current location:', CURRENT_LOCATION);
+        // ----------------------------------
         const DEFAULT_USERNAME = "admin";
         const DEFAULT_PASSWORD = "admin123";
         
