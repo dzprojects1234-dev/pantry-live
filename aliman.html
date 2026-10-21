@@ -1735,7 +1735,8 @@
             });
         }
         
-        function updateCharts() {
+            function updateCharts() {
+            if (!currentItems || currentItems.length === 0) return; // <--- ADD THIS LINE
             const selectedItemId = parseInt(itemSelect.value) || currentItems[0].id;
             updateWeeklyChart(selectedItemId);
             updateDistributionChart();
