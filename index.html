@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Masjid Al-Khair Pantry - Stock Management</title>
+    <title>Masjid Al-Khair - Stock Management</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -642,7 +642,7 @@
 </head>
 <body>
     <div class="print-header">
-        <h1 class="print-title">Masjid Al-Khair Pantry - Stock Report</h1>
+        <h1 class="print-title">Masjid Al-Khair - Stock Report</h1>
         <p class="print-subtitle">Stock Management System | Generated: <span id="printDate"></span></p>
     </div>
     
@@ -661,7 +661,7 @@
                 </button>
             </div>
             
-            <h1>Masjid Al-Khair Pantry</h1>
+            <h1>Masjid Al-Khair</h1>
             <p class="subtitle">Stock Management System with Usage Tracking</p>
             
             <div class="live-time-container">
@@ -855,7 +855,7 @@
         </div>
         
         <div class="print-footer">
-            <p>Masjid Al-Khair Pantry Stock Management System | Page <span class="pageNumber"></span></p>
+            <p>Masjid Al-Khair Stock Management System | Page <span class="pageNumber"></span></p>
             <p>Report generated on <span id="printFooterDate"></span> | For official use only</p>
         </div>
     </div>
@@ -1979,7 +1979,7 @@
                 <!DOCTYPE html>
                 <html>
                 <head>
-                    <title>Masjid Al-Khair Pantry Stock Report - ${currentDate.toISOString().split('T')[0]}</title>
+                    <title>Masjid Al-Khair Stock Report - ${currentDate.toISOString().split('T')[0]}</title>
                     <style>
                         body { font-family: Arial, sans-serif; margin: 20px; }
                         h1 { color: #333; text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px; }
@@ -1999,10 +1999,10 @@
                     </style>
                 </head>
                 <body>
-                    <h1>Masjid Al-Khair Pantry - Stock Report</h1>
+                    <h1>Masjid Al-Khair - Stock Report</h1>
                     <div class="report-info">
                         <p><strong>Generated:</strong> ${formattedDate}</p>
-                        <p><strong>Location:</strong> Masjid Al-Khair Pantry - Stock Room</p>
+                        <p><strong>Location:</strong> Masjid Al-Khair - Stock Room</p>
                         <p><strong>Total Items Tracked:</strong> ${currentItems.length}</p>
                     </div>
                     
@@ -2041,8 +2041,8 @@
                     ` : '<p>No recent stock movements recorded.</p>'}
                     
                     <div class="footer">
-                        <p>Masjid Al-Khair Pantry Stock Management System - Report generated on ${formattedDate}</p>
-                        <p>For any discrepancies, please contact the pantry administrator.</p>
+                        <p>Masjid Al-Khair Stock Management System - Report generated on ${formattedDate}</p>
+                        <p>For any discrepancies, please contact the administrator.</p>
                     </div>
                     
                     <div class="no-print" style="margin-top: 20px; text-align: center;">
@@ -2058,9 +2058,9 @@
         
         function printToCSV() {
             let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "MASJID AL-KHAIR PANTRY STOCK REPORT\n";
+            csvContent += "MASJID AL-KHAIR STOCK REPORT\n";
             csvContent += `Generated: ${formatDateTime(new Date())}\n`;
-            csvContent += "Location: Masjid Al-Khair Pantry - Stock Room\n\n";
+            csvContent += "Location: Masjid Al-Khair - Stock Room\n\n";
             csvContent += "CURRENT STOCK LEVELS\n";
             csvContent += "No,Item,Unit,Current Quantity,Min Quantity,Max Quantity,Status,Last Updated\n";
             currentItems.forEach((item, index) => {
@@ -2078,7 +2078,7 @@
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement('a');
             link.href = encodedUri;
-            link.download = `pantry_stock_report_${new Date().toISOString().split('T')[0]}.csv`;
+            link.download = `stock_report_${new Date().toISOString().split('T')[0]}.csv`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
