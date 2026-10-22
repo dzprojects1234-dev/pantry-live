@@ -1056,7 +1056,7 @@
                     version: '2.0'
                 };
                 
-                const response = await fetchFromApi('/save?mosque=al-khair&location=pantry', {
+                    const response = await fetchFromApi(`/save?mosque=al-khair&location=${CURRENT_LOCATION}`, {
                     method: 'POST',
                     body: JSON.stringify(dataToSave)
                 });
@@ -1070,7 +1070,7 @@
         async function loadFromApi() {
             if (!isOnline) return null;
             try {
-                const data = await fetchFromApi('/load?mosque=al-khair&location=pantry');
+                const data = await fetchFromApi(`/load?mosque=al-khair&location=${CURRENT_LOCATION}`);
                 if (data && data.items) {
                     return {
                         items: data.items,
@@ -1472,6 +1472,19 @@
             });
             
             checkAlertsBtn.addEventListener('click', checkAllAlerts);
+                        // --- LOCATION DROPDOWN SWITCHER (Step 3) ---
+            const locationDropdown = document.getElementById('locationDropdown');
+            if (locationDropdown) {
+                // 1. Set the dropdown to show the current location on load
+                locationDropdown.value = CURRENT_LOCATION;
+                
+                // 2. When the user picks a new location, reload the page with the new URL
+                locationDropdown.addEventListener('change', function() {
+                    const newLocation = this.value;
+                    window.location.href = `?location=${newLocation}`;
+                });
+            }
+            // -------------------------------------------
             
             if (logoutBtn) {
                 logoutBtn.addEventListener('click', () => {
