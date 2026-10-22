@@ -1513,7 +1513,7 @@
                 const adminKey = document.getElementById('adminKey').value;
                 
                 if (isOnline) {
-                    const apiLoginSuccess = await loginToApi(username, password);
+                    const apiLoginSuccess = await loginToApi(username, password, adminKey);
                     if (apiLoginSuccess) {
                         isAdminMode = true;
                         toggleAdminMode(true);
