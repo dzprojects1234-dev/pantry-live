@@ -1084,7 +1084,7 @@
             return null;
         }
         
-        async function loginToApi(username, password) {
+        async function loginToApi(username, password, adminKey) {
             try {
                 const response = await fetch(`${API_BASE}/auth/login`, {
                     method: 'POST',
@@ -1512,7 +1512,7 @@
                 const adminKey = document.getElementById('adminKey').value;
                 
                 if (isOnline) {
-                    const apiLoginSuccess = await loginToApi(username, password);
+                    const apiLoginSuccess = await loginToApi(username, password, adminKey);
                     if (apiLoginSuccess) {
                         isAdminMode = true;
                         toggleAdminMode(true);
