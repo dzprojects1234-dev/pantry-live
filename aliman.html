@@ -670,15 +670,14 @@
                     <span id="currentDateTime">Loading...</span>
                     <span class="seconds" id="seconds">00</span>
                 </div>
-            <div class="location">
-                <i class="fas fa-map-marker-alt"></i>
-                <select id="locationDropdown" class="form-control" style="width: auto; padding: 8px 40px 8px 14px; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); cursor: pointer;">
-                    <option value="pantry">Pantry</option>
-                    <option value="basement">Basement</option>
-                  </select>
-                </div>
+                <div class="location">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <select id="locationDropdown" class="form-control" style="width: auto; padding: 8px 40px 8px 14px; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); cursor: pointer;">
+                       <option value="pantry">Pantry</option>
+                       <option value="basement">Basement</option>
+                     </select>
+                  </div>
             </div>
-        </header>
         
         <div class="alert-panel" id="alertPanel"></div>
         
@@ -1084,7 +1083,7 @@
             return null;
         }
         
-        async function loginToApi(username, password) {
+        async function loginToApi(username, password, adminKey) {
             try {
                 const response = await fetch(`${API_BASE}/auth/login`, {
                     method: 'POST',
@@ -1507,7 +1506,7 @@
                 const adminKey = document.getElementById('adminKey').value;
                 
                 if (isOnline) {
-                    const apiLoginSuccess = await loginToApi(username, password);
+                    const apiLoginSuccess = await loginToApi(username, password, adminKey);
                     if (apiLoginSuccess) {
                         isAdminMode = true;
                         toggleAdminMode(true);
