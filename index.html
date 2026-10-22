@@ -1625,6 +1625,7 @@
         async function updateItemStock(itemId, newQuantity) {
             if (!isAdminMode) {
                 showAlert('Please login as admin to update stock', false);
+                document.getElementById('loginModal').classList.add('active'); // 👈 opens login popup
                 return;
             }
             
@@ -1668,6 +1669,7 @@
         async function updateAllStocks() {
             if (!isAdminMode) {
                 showAlert('Please login as admin to update stock', false);
+                document.getElementById('loginModal').classList.add('active'); // 👈 opens login popup
                 return;
             }
             
