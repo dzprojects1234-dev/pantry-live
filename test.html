@@ -1094,7 +1094,7 @@
             return null;
         }
         
-        async function loginToApi(username, password) {
+        async function loginToApi(username, password, adminKey) {
             try {
                 const response = await fetch(`${API_BASE}/auth/login`, {
                     method: 'POST',
