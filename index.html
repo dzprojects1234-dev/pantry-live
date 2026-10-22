@@ -1089,7 +1089,7 @@
                 const response = await fetch(`${API_BASE}/auth/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    bbody: JSON.stringify({ username, password, adminKey })
+                    body: JSON.stringify({ username, password, adminKey })
                 });
                 
                 if (response.ok) {
