@@ -2108,7 +2108,84 @@
                 errorAlert.style.display = 'none';
             }, 3000);
         }
+
+// --- PART 2: ADD ITEM LOGIC ---
+
+function openAddModal() {
+  // Clear any old data from the form
+  document.getElementById('newItemName').value = '';
+  document.getElementById('newItemCategory').value = '';
+  document.getElementById('newItemCode').value = '';
+  document.getElementById('newItemQty').value = '1';
+  document.getElementById('newItemUnit').value = 'pcs';
+  document.getElementById('newItemMinQty').value = '0';
+  
+  // Show the modal
+  document.getElementById('addItemModal').style.display = 'flex';
+}
+
+async function submitNewItem() {
+  const name = document.getElementById('newItemName').value.trim();
+  const category = document.getElementById('newItemCategory').value.trim() || 'Other';
+  const code = document.getElementById('newItemCode').value.trim() || 'Not Applicable';
+  const quantity = parseInt(document.getElementById('newItemQty').value) || 0;
+  const unit = document.getElementById('newItemUnit').value.trim() || 'pcs';
+  const min_quantity = parseInt(document.getElementById('newItemMinQty').value) || 0;
+
+  if (!name) {
+    alert("Item Name is required!");
+    return;
+  }
+
+  // We need the token to prove we are admin
+  const token = localStorage.getItem('pantry_token'); // <-- Assuming your login saves the token here
+  
+  if (!token) {
+    alert("You must be logged in as Admin to do this.");
+    return;
+  }
+
+  // Create the new item object (Notice: no ID! The Worker/Supabase will create it)
+  const newItem = {
+    name: name,
+    category: category,
+    code: code,
+    quantity: quantity,
+    unit: unit,
+    min_quantity: min_quantity
+  };
+
+  try {
+    // Send to your Worker's /save endpoint
+    const response = await fetch(`${API_BASE}/api/pantry/save?mosque=al-khair&location=basement`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ items: [newItem] }) // Send it as an array
+    });
+
+    if (response.ok) {
+      alert("Item added successfully!");
+      document.getElementById('addItemModal').style.display = 'none';
+      // Reload the inventory data to show the new item
+      if (typeof loadData === 'function') {
+         loadData(); 
+      } else {
+         location.reload(); // Fallback: just refresh the page
+      }
+    } else {
+      alert("Failed to add item. Check console.");
+      console.error(await response.text());
+    }
+  } catch (error) {
+    console.error("Error adding item:", error);
+    alert("Network error.");
+  }
+}        
     </script>
+    
 <!-- ADD ITEM MODAL -->
 <div id="addItemModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
   <div style="background: white; padding: 20px; border-radius: 8px; width: 90%; max-width: 400px; text-align: left;">
