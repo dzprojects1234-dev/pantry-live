@@ -2109,5 +2109,41 @@
             }, 3000);
         }
     </script>
+<!-- ADD ITEM MODAL -->
+<div id="addItemModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+  <div style="background: white; padding: 20px; border-radius: 8px; width: 90%; max-width: 400px; text-align: left;">
+    <h3 style="margin-top: 0;">Add New Item</h3>
+    
+    <label style="display: block; margin-top: 10px;">Item Name:</label>
+    <input type="text" id="newItemName" style="width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box;" placeholder="e.g. Rice Cooker">
+    
+    <label style="display: block; margin-top: 10px;">Category:</label>
+    <input type="text" id="newItemCategory" style="width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box;" placeholder="e.g. Dining">
+    
+    <label style="display: block; margin-top: 10px;">Code (Optional):</label>
+    <input type="text" id="newItemCode" style="width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box;" placeholder="e.g. SKP-CUP-01">
+    
+    <div style="display: flex; gap: 10px; margin-top: 10px;">
+      <div style="flex: 1;">
+        <label style="display: block;">Quantity:</label>
+        <input type="number" id="newItemQty" style="width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box;" value="1">
+      </div>
+      <div style="flex: 1;">
+        <label style="display: block;">Unit:</label>
+        <input type="text" id="newItemUnit" style="width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box;" value="pcs">
+      </div>
+      <div style="flex: 1;">
+        <label style="display: block;">Min Qty:</label>
+        <input type="number" id="newItemMinQty" style="width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box;" value="0">
+      </div>
+    </div>
+
+    <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+      <button onclick="document.getElementById('addItemModal').style.display='none'" style="padding: 8px 16px; cursor: pointer; background: #ccc; border: none; border-radius: 4px;">Cancel</button>
+      <button onclick="submitNewItem()" style="padding: 8px 16px; cursor: pointer; background: #4CAF50; color: white; border: none; border-radius: 4px;">Save Item</button>
+    </div>
+  </div>
+</div>
+    
 </body>
 </html>
