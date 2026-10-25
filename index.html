@@ -1528,14 +1528,14 @@
                 });
             }
             
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', () => {
-                    if (confirm('Bro, are you sure you want to log out?')) {
-                        localStorage.clear();
-                        window.location.reload();
-                    }
-                });
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            if (confirm('Bro, are you sure you want to log out?')) {
+                localStorage.clear();
+                window.location.href = window.location.pathname;
             }
+        });
+    }
             
             closeLoginModal.addEventListener('click', () => {
                 loginModal.classList.remove('active');
