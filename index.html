@@ -641,6 +641,7 @@
     </style>
 </head>
 <body>
+    <div id="appContent" style="display:none;">   <!-- ADD THIS LINE -->
     <div class="print-header">
         <h1 class="print-title">Masjid Al-Khair - Stock Report</h1>
         <p class="print-subtitle">Stock Management System | Generated: <span id="printDate"></span></p>
@@ -2251,5 +2252,18 @@
           }
         }
     </script>
+</div> <!-- This closes the appContent box -->
+
+<!-- ===== LOGIN SCREEN ===== -->
+<div id="loginScreen" style="display:none; max-width:400px; margin:80px auto; padding:30px; border:1px solid #ccc; border-radius:10px; font-family:sans-serif; text-align:center;">
+    <h2>🔒 Admin Login</h2>
+    <p>Please log in to view or manage inventory.</p>
+    <input id="loginPassword" type="password" placeholder="Enter admin password" style="width:90%; padding:10px; margin:10px 0; font-size:16px;">
+    <br>
+    <button id="loginBtn" style="padding:10px 30px; font-size:16px; cursor:pointer;">Login</button>
+    <p id="loginError" style="color:red; display:none;">❌ Wrong password. Try again.</p>
+</div>
+
 </body>
+</html>
 </html>
