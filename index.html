@@ -1077,8 +1077,7 @@
                     authToken = null;
                     isAdminMode = false;
                     toggleAdminMode(false);
-                    loginModal.classList.add('active');
-                    showAlert('Session expired. Please login again.', false);
+                    // REMOVED: loginModal.classList.add('active'); 
                     return null;
                 }
                 
@@ -1578,7 +1577,7 @@
             });
         }
         
-   function toggleAdminMode(enable) {
+        function toggleAdminMode(enable) {
             isAdminMode = enable;
             viewModeIndicator.classList.toggle('active', !enable);
             
@@ -1586,6 +1585,9 @@
             if (logoutBtn) {
                 logoutBtn.style.display = enable ? 'flex' : 'none';
             }
+
+            renderStockList(); // Re-render to show/hide delete buttons
+        }
             
             renderStockList(); // Re-render to show/hide delete buttons
     }
