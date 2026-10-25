@@ -1099,36 +1099,67 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
             checkAllAlerts();
         });
         
-        async function testApiConnection() {
-            try {
-                // If no token, we are logged out. Just assume online and skip the check.
-                if (!authToken) {
-                    isOnline = true;
-                    apiStatus.className = 'api-status connected';
-                    apiStatus.innerHTML = '<i class="fas fa-plug"></i> API: Connected';
-                    return; 
-                }
-
-                const response = await fetch(`${API_BASE}/health`, {
-                    method: 'GET',
-                    headers: getAuthHeaders()
-                });
-                
-                if (response.ok) {
-                    isOnline = true;
-                    apiStatus.className = 'api-status connected';
-                    apiStatus.innerHTML = '<i class="fas fa-plug"></i> API: Connected';
-                    console.log('API connection successful');
-                } else {
-                    throw new Error('API not responding');
-                }
-            } catch (error) {
-                isOnline = false;
-                apiStatus.className = 'api-status disconnected';
-                apiStatus.innerHTML = '<i class="fas fa-plug"></i> API: Disconnected (Using Local Storage)';
-                console.warn('API connection failed, using local storage:', error);
-            }
+async function testApiConnection() {
+    try {
+        // If no token, we are logged out. Just assume online and skip the check.
+        if (!localStorage.getItem(AUTH_TOKEN_KEY)) {
+            isOnline = true;
+            apiStatus.className = 'api-status connected';
+            apiStatus.innerHTML = '<i class="fas fa-plug"></i> API: Connected';
+            return; 
         }
+
+        const response = await fetch(`${API_BASE}/health`, {
+            method: 'GET',
+            headers: getAuthHeaders()
+        });
+        
+        if (response.ok) {
+            isOnline = true;
+            apiStatus.className = 'api-status connected';
+            apiStatus.innerHTML = '<i class="fas fa-plug"></i> API: Connected';
+            console.log('API connection successful');
+        } else {
+            throw new Error('API not responding');
+        }
+    } catch (error) {
+        isOnline = false;
+        apiStatus.className = 'api-status disconnected';
+        apiStatus.innerHTML = '<i class="fas fa-plug"></i> API: Disconnected (Using Local Storage)';
+        console.warn('API connection failed, using local storage:', error);
+    }
+}
+
+function getAuthHeaders() {
+    const headers = { 'Content-Type': 'application/json' };
+    const token = localStorage.getItem(AUTH_TOKEN_KEY);
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+    return headers;
+}
+
+async function fetchFromApi(endpoint, options = {}) {
+    try {
+        const response = await fetch(`${API_BASE}${endpoint}`, {
+            ...options,
+            headers: getAuthHeaders()
+        });
+        
+        if (response.status === 401 || response.status === 403) {
+            // Token expired or invalid
+            localStorage.removeItem(AUTH_TOKEN_KEY);
+            applyAuthState(); // This will safely show the Login Screen
+            return null;
+        }
+        
+        if (!response.ok) throw new Error(`API error: ${response.status}`);
+        return await response.json();
+    } catch (error) {
+        console.error(`API call failed for ${endpoint}:`, error);
+        return null;
+    }
+}
         
         function getAuthHeaders() {
             const headers = { 'Content-Type': 'application/json' };
@@ -2315,19 +2346,7 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
             alert("Network error.");
           }
         }
-    // Force the Logout button to use our new logic
-    const logoutBtnElement = document.getElementById('logoutBtn');
-    if (logoutBtnElement) {
-        // Clone the button to remove old event listeners
-        const newLogoutBtn = logoutBtnElement.cloneNode(true);
-        logoutBtnElement.parentNode.replaceChild(newLogoutBtn, logoutBtnElement);
-    
-    // Add our new listener
-    newLogoutBtn.addEventListener('click', () => {
-        localStorage.removeItem(AUTH_TOKEN_KEY);
-        applyAuthState();
-    });
-}    
+   
     </script>
 </div> <!-- This closes the appContent box -->
 
