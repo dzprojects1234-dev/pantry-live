@@ -2346,7 +2346,50 @@ async function fetchFromApi(endpoint, options = {}) {
             alert("Network error.");
           }
         }
-   
+// ===== FINAL AUTH & LOGIN/LOGOUT HANDLERS =====
+document.addEventListener('DOMContentLoaded', () => {
+    
+    // 1. Login Button
+    const loginBtn = document.getElementById('loginBtn');
+    if (loginBtn) {
+        loginBtn.addEventListener('click', async () => {
+            const pwd = document.getElementById('loginPassword').value;
+            const errEl = document.getElementById('loginError');
+            errEl.style.display = 'none';
+
+            try {
+                const res = await fetch('https://frosty-frog-9bafpantry.dz-projects1234.workers.dev/api/pantry/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: pwd })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    localStorage.setItem(AUTH_TOKEN_KEY, data.token || 'true');
+                    document.getElementById('loginPassword').value = '';
+                    applyAuthState(); // Show the app
+                    if (typeof loadInventory === 'function') loadInventory(); 
+                } else {
+                    errEl.style.display = 'block';
+                }
+            } catch (e) {
+                console.error("Login error:", e);
+                errEl.style.display = 'block';
+            }
+        });
+    }
+
+    // 2. Logout Button
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem(AUTH_TOKEN_KEY);
+            applyAuthState(); // Instantly hides data and shows Login Screen
+        });
+    }
+
+});
     </script>
 </div> <!-- This closes the appContent box -->
 
