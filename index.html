@@ -36,8 +36,8 @@
         header h1 { font-size: 2.8rem; margin-bottom: 8px; color: white; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); }
         .subtitle { font-size: 1.1rem; opacity: 0.9; color: rgba(255, 255, 255, 0.9); margin-bottom: 25px; }
         .live-time-container { display: flex; gap: 30px; background: rgba(0, 0, 0, 0.2); padding: 15px 20px; border-radius: 12px; backdrop-filter: blur(10px); max-width: fit-content; }
-        .live-time, .location { display: flex; align-items: center; gap: 10px; font-size: 1.1rem; }
-        .live-time i, .location i { color: var(--primary-light); font-size: 1.2rem; }
+        .live-time { display: flex; align-items: center; gap: 10px; font-size: 1.1rem; }
+        .live-time i { color: var(--primary-light); font-size: 1.2rem; }
         .seconds { font-weight: bold; color: var(--primary-light); animation: pulse 1s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         .tabs { display: flex; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; }
@@ -105,7 +105,6 @@
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .form-control { padding: 12px 16px; border: 2px solid var(--border-color); border-radius: 8px; background: var(--card-bg); color: var(--text-color); font-size: 1rem; width: 100%; transition: all 0.3s; }
         .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2); }
-        select.form-control { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; padding-right: 40px; }
         .file-label { padding: 12px 24px; background: var(--warning); color: white; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-weight: 600; transition: all 0.3s; }
         .file-label:hover { background: #e65c00; transform: translateY(-2px); }
         .file-input { display: none; }
@@ -125,18 +124,6 @@
         .usage-low { color: var(--success); }
         .movement-positive { color: var(--success); font-weight: 600; }
         .movement-negative { color: var(--warning); font-weight: 600; }
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.7); display: flex; align-items: center; justify-content: center; z-index: 10000; opacity: 0; pointer-events: none; transition: opacity 0.3s; backdrop-filter: blur(5px); }
-        .modal-overlay.active { opacity: 1; pointer-events: all; }
-        .modal { background: var(--card-bg); border-radius: 16px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; border: 1px solid var(--border-color); box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); animation: modalSlideIn 0.3s ease; }
-        @keyframes modalSlideIn { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
-        .modal-header { padding: 25px 30px; border-bottom: 2px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
-        .modal-header h3 { font-size: 1.5rem; display: flex; align-items: center; gap: 10px; color: var(--text-color); }
-        .close-modal { background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; padding: 5px; transition: color 0.3s; }
-        .close-modal:hover { color: var(--text-color); }
-        .modal form { padding: 30px; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-color); }
-        .modal-actions { display: flex; justify-content: flex-end; gap: 15px; margin-top: 30px; }
         .info-box { background: rgba(67, 97, 238, 0.1); border: 1px solid rgba(67, 97, 238, 0.3); border-radius: 10px; padding: 20px; margin-top: 25px; display: flex; gap: 15px; }
         .info-box i { color: var(--primary); font-size: 1.2rem; margin-top: 3px; }
         .controls-panel { display: flex; flex-wrap: wrap; gap: 15px; margin: 30px 0; padding: 25px; background: var(--card-light); border-radius: 12px; border: 1px solid var(--border-color); }
@@ -152,31 +139,14 @@
             .print-footer { display: block; text-align: center; padding: 20px; border-top: 2px solid #000; margin-top: 30px; font-size: 0.9rem; color: #666; }
             .print-title { font-size: 2rem; margin-bottom: 10px; }
             .print-subtitle { font-size: 1rem; color: #666; }
-            .header-controls, .theme-toggle, .admin-btn, .tab-btn, .update-btn, .btn, .controls-panel, .info-box, .alert, .modal-overlay { display: none !important; }
+            .header-controls, .theme-toggle, .admin-btn, .tab-btn, .update-btn, .btn, .controls-panel, .info-box, .alert { display: none !important; }
             .tab-content { display: block !important; }
             body { background: white !important; color: black !important; }
             .card { background: white !important; border: 1px solid #ddd !important; box-shadow: none !important; }
             .stock-item { break-inside: avoid; border: 1px solid #ddd !important; background: white !important; }
         }
-        @media (max-width: 1200px) {
-            .container { padding: 15px; }
-            .stock-item { grid-template-columns: 1fr; gap: 15px; }
-            .charts-grid { grid-template-columns: 1fr; }
-        }
-        @media (max-width: 768px) {
-            header h1 { font-size: 2rem; }
-            .tabs { flex-direction: column; }
-            .tab-btn { min-width: 100%; }
-            .card-header { flex-direction: column; align-items: flex-start; }
-            .live-time-container { flex-direction: column; gap: 15px; }
-            .modal { width: 95%; margin: 10px; }
-            .controls-panel { flex-direction: column; }
-            .header-controls { position: static; margin-bottom: 15px; }
-        }
-        .user-badge { background: rgba(255, 255, 255, 0.2); padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
-        .toast-notification { position: fixed; bottom: 20px; right: 20px; background: var(--primary); color: white; padding: 15px 25px; border-radius: 10px; display: flex; align-items: center; gap: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); z-index: 1000; animation: slideInRight 0.3s ease; }
-        #data-management .controls-panel { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
-        .loading { opacity: 0.6; pointer-events: none; }
+        @media (max-width: 1200px) { .container { padding: 15px; } .stock-item { grid-template-columns: 1fr; gap: 15px; } .charts-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { header h1 { font-size: 2rem; } .tabs { flex-direction: column; } .tab-btn { min-width: 100%; } .card-header { flex-direction: column; align-items: flex-start; } .live-time-container { flex-direction: column; gap: 15px; } .controls-panel { flex-direction: column; } .header-controls { position: static; margin-bottom: 15px; } }
         .loading-spinner { border: 3px solid var(--border-color); border-top: 3px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .api-status { position: fixed; bottom: 10px; right: 10px; padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; z-index: 1000; }
@@ -186,7 +156,7 @@
 </head>
 <body>
     
-    <!-- ===== LOGIN SCREEN (Now shows first when logged out) ===== -->
+    <!-- ===== LOGIN SCREEN ===== -->
     <div id="loginScreen" style="display:none; max-width:400px; margin:80px auto; padding:30px; border:1px solid var(--border-color); background: var(--card-bg); color: var(--text-color); border-radius:10px; font-family:sans-serif; text-align:center; box-shadow: 0 8px 30px rgba(0,0,0,0.2);">
         <h2>🔒 Admin Login</h2>
         <p style="margin-bottom: 20px;">Please log in to view or manage inventory.</p>
@@ -227,13 +197,6 @@
                     <span id="currentDateTime">Loading...</span>
                     <span class="seconds" id="seconds">00</span>
                 </div>
-                <div class="location">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <select id="locationDropdown" class="form-control" style="width: auto; padding: 8px 40px 8px 14px; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); cursor: pointer;">
-                       <option value="pantry">Pantry</option>
-                       <option value="basement">Basement</option>
-                     </select>
-                  </div>
             </div>
         
         <div class="alert-panel" id="alertPanel"></div>
@@ -269,7 +232,6 @@
                         <button class="btn btn-secondary" id="refreshBtn">
                             <i class="fas fa-sync-alt"></i> Refresh
                         </button>
-                        <!-- ADD ITEM BUTTON (Admin Only) -->
                         <button class="btn btn-success admin-only" onclick="openAddModal()">
                             <i class="fas fa-plus"></i> Add Item
                         </button>
@@ -492,10 +454,8 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            // Apply auth state immediately
             applyAuthState();
 
-            // Login Button (SECURED)
             const loginBtn = document.getElementById('loginBtn');
             const passwordInput = document.getElementById('loginPassword');
             const errEl = document.getElementById('loginError');
@@ -511,16 +471,15 @@
                 }
 
                 try {
-                    // We ask the Cloudflare Worker to check the password
-                    const res = await fetch(`${API_BASE}/login`, {
+                    const res = await fetch(`${API_BASE}/auth/login`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ password: pwd })
+                        body: JSON.stringify({ mosqueId: CURRENT_MOSQUE, password: pwd })
                     });
 
                     if (res.ok) {
                         const data = await res.json();
-                        localStorage.setItem(AUTH_TOKEN_KEY, data.token || 'true');
+                        localStorage.setItem(AUTH_TOKEN_KEY, data.token);
                         passwordInput.value = '';
                         applyAuthState(); 
                         if (typeof loadData === 'function') loadData(); 
@@ -535,21 +494,13 @@
                 }
             }
 
-            if (loginBtn) {
-                loginBtn.addEventListener('click', attemptLogin);
-            }
-
-            // This makes the "Enter" key work properly!
+            if (loginBtn) loginBtn.addEventListener('click', attemptLogin);
             if (passwordInput) {
                 passwordInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') {
-                        e.preventDefault(); // Stops the page from reloading
-                        attemptLogin();
-                    }
+                    if (e.key === 'Enter') { e.preventDefault(); attemptLogin(); }
                 });
             }
 
-            // Logout Button
             const logoutBtn = document.getElementById('logoutBtn');
             if (logoutBtn) {
                 logoutBtn.addEventListener('click', () => {
@@ -560,12 +511,8 @@
         });
 
         // ===== 2. APP LOGIC =====
-        function getCurrentLocation() {
-            const params = new URLSearchParams(window.location.search);
-            const loc = params.get('location');
-            return (loc === 'basement') ? 'basement' : 'pantry';
-        }
-        const CURRENT_LOCATION = getCurrentLocation();
+        const CURRENT_MOSQUE = 'al-khair'; 
+        const CURRENT_LOCATION = 'pantry';
         
         const initialItems = [
             { id: 1, name: "Milo", unit: "tins", quantity: 10, min_quantity: 1, max_quantity: 20, last_updated: "", notes: [] },
@@ -636,10 +583,7 @@
                     return; 
                 }
 
-                const response = await fetch(`${API_BASE}/health`, {
-                    method: 'GET',
-                    headers: getAuthHeaders()
-                });
+                const response = await fetch(`${API_BASE}/health`, { method: 'GET', headers: getAuthHeaders() });
                 
                 if (response.ok) {
                     isOnline = true;
@@ -658,18 +602,13 @@
         function getAuthHeaders() {
             const headers = { 'Content-Type': 'application/json' };
             const token = localStorage.getItem(AUTH_TOKEN_KEY);
-            if (token) {
-                headers['Authorization'] = `Bearer ${token}`;
-            }
+            if (token) headers['Authorization'] = `Bearer ${token}`;
             return headers;
         }
 
         async function fetchFromApi(endpoint, options = {}) {
             try {
-                const response = await fetch(`${API_BASE}${endpoint}`, {
-                    ...options,
-                    headers: getAuthHeaders()
-                });
+                const response = await fetch(`${API_BASE}${endpoint}`, { ...options, headers: getAuthHeaders() });
                 
                 if (response.status === 401 || response.status === 403) {
                     localStorage.removeItem(AUTH_TOKEN_KEY);
@@ -689,7 +628,7 @@
             if (!isOnline) return false;
             try {
                 const dataToSave = { items: currentItems, stockMovements: stockMovements, usageData: usageData, lastSaved: new Date().toISOString(), version: '2.0' };
-                const response = await fetchFromApi(`/save?mosque=al-khair&location=${CURRENT_LOCATION}`, { method: 'POST', body: JSON.stringify(dataToSave) });
+                const response = await fetchFromApi(`/save?mosque=${CURRENT_MOSQUE}&location=${CURRENT_LOCATION}`, { method: 'POST', body: JSON.stringify(dataToSave) });
                 return response !== null;
             } catch (error) { return false; }
         }
@@ -697,7 +636,7 @@
         async function loadFromApi() {
             if (!isOnline) return null;
             try {
-                const data = await fetchFromApi(`/load?mosque=al-khair&location=${CURRENT_LOCATION}`);
+                const data = await fetchFromApi(`/load?mosque=${CURRENT_MOSQUE}&location=${CURRENT_LOCATION}`);
                 if (data && data.items) {
                     return { items: data.items, stockMovements: data.stockMovements || [], usageData: data.usageData || { daily: {}, weekly: {}, monthly: {} } };
                 }
@@ -746,9 +685,7 @@
         async function loadData() {
             loadingSpinner.style.display = 'block';
             let apiData = null;
-            if (isOnline && localStorage.getItem(AUTH_TOKEN_KEY)) {
-                apiData = await loadFromApi();
-            }
+            if (isOnline && localStorage.getItem(AUTH_TOKEN_KEY)) apiData = await loadFromApi();
             
             if (apiData) {
                 currentItems = apiData.items;
@@ -762,20 +699,12 @@
                         currentItems = parsedData.items || [];
                         stockMovements = parsedData.stockMovements || [];
                         usageData = parsedData.usageData || { daily: {}, weekly: {}, monthly: {} };
-                    } catch (e) {
-                        initializeDefaultData();
-                    }
-                } else {
-                    initializeDefaultData();
-                }
+                    } catch (e) { initializeDefaultData(); }
+                } else { initializeDefaultData(); }
             }
             
             currentItems.sort((a, b) => a.id - b.id);
-            renderStockList();
-            initializeMonthlySelect();
-            renderMonthlyTable();
-            populateItemSelect();
-            renderMovementTable();
+            renderStockList(); initializeMonthlySelect(); renderMonthlyTable(); populateItemSelect(); renderMovementTable();
             
             setTimeout(() => {
                 if (typeof updateCharts === 'function') updateCharts();
@@ -786,8 +715,7 @@
         function initializeDefaultData() {
             currentItems = JSON.parse(JSON.stringify(initialItems));
             currentItems.forEach(item => { item.last_updated = formatDateTime(new Date()); });
-            initializeSampleMovements();
-            initializeUsageData();
+            initializeSampleMovements(); initializeUsageData();
         }
         
         function initializeSampleMovements() {
@@ -804,17 +732,14 @@
         
         function getWeekNumber(date) {
             const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-            const dayNum = d.getUTCDay() || 7;
-            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const dayNum = d.getUTCDay() || 7; d.setUTCDate(d.getUTCDate() + 4 - dayNum);
             const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
             return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
         }
         
         async function saveData() {
             let apiSaved = false;
-            if (isOnline && localStorage.getItem(AUTH_TOKEN_KEY)) {
-                apiSaved = await saveToApi();
-            }
+            if (isOnline && localStorage.getItem(AUTH_TOKEN_KEY)) apiSaved = await saveToApi();
             const dataToSave = { items: currentItems, stockMovements: stockMovements, usageData: usageData, lastSaved: new Date().toISOString(), version: '2.0' };
             localStorage.setItem('pantryStockData', JSON.stringify(dataToSave));
             return apiSaved || !isOnline;
@@ -862,45 +787,27 @@
                 const notesContainer = document.getElementById(`notesTable-${item.id}`);
                 renderNotesTable(item, notesContainer);
             });
-            attachUpdateEventListeners();
-            attachNoteEventListeners();
-            if (typeof applyAuthState === 'function') applyAuthState(); // Ensure delete buttons obey auth
+            attachUpdateEventListeners(); attachNoteEventListeners();
         }
         
         function renderNotesTable(item, container) {
             container.innerHTML = '';
-            if (!item.notes || item.notes.length === 0) {
-                container.innerHTML = '<div style="text-align: center; padding: 10px; color: var(--text-muted);">No notes yet</div>';
-                return;
-            }
-            const table = document.createElement('table');
-            table.className = 'notes-table';
-            const thead = document.createElement('thead');
-            thead.innerHTML = `<tr><th>Date</th><th>Note</th><th>Added By</th><th style="width: 40px;">Action</th></tr>`;
-            table.appendChild(thead);
+            if (!item.notes || item.notes.length === 0) { container.innerHTML = '<div style="text-align: center; padding: 10px; color: var(--text-muted);">No notes yet</div>'; return; }
+            const table = document.createElement('table'); table.className = 'notes-table';
+            const thead = document.createElement('thead'); thead.innerHTML = `<tr><th>Date</th><th>Note</th><th>Added By</th><th style="width: 40px;">Action</th></tr>`; table.appendChild(thead);
             const tbody = document.createElement('tbody');
             item.notes.forEach(note => {
                 const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td style="white-space: nowrap;">${note.date}</td>
-                    <td>${note.text}</td>
-                    <td>${note.addedBy}</td>
-                    <td><button class="delete-note-btn" data-item-id="${item.id}" data-note-id="${note.id}" ${!isAdminMode ? 'disabled' : ''}><i class="fas fa-trash"></i></button></td>
-                `;
+                row.innerHTML = `<td style="white-space: nowrap;">${note.date}</td><td>${note.text}</td><td>${note.addedBy}</td><td><button class="delete-note-btn" data-item-id="${item.id}" data-note-id="${note.id}" ${!isAdminMode ? 'disabled' : ''}><i class="fas fa-trash"></i></button></td>`;
                 tbody.appendChild(row);
             });
-            table.appendChild(tbody);
-            container.appendChild(table);
+            table.appendChild(tbody); container.appendChild(table);
             container.querySelectorAll('.delete-note-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
-                    const itemId = parseInt(this.dataset.itemId);
-                    const noteId = parseInt(this.dataset.noteId);
+                    const itemId = parseInt(this.dataset.itemId); const noteId = parseInt(this.dataset.noteId);
                     if (deleteNote(itemId, noteId)) {
-                        const itemContainer = this.closest('.stock-item');
-                        const notesContainer = itemContainer.querySelector('.notes-table-container');
-                        const item = currentItems.find(item => item.id === itemId);
-                        renderNotesTable(item, notesContainer);
-                        showAlert('Note deleted successfully!', true);
+                        const itemContainer = this.closest('.stock-item'); const notesContainer = itemContainer.querySelector('.notes-table-container');
+                        const item = currentItems.find(item => item.id === itemId); renderNotesTable(item, notesContainer); showAlert('Note deleted successfully!', true);
                     }
                 });
             });
@@ -909,30 +816,18 @@
         function renderMovementTable() {
             movementTable.innerHTML = '';
             const recentMovements = stockMovements.slice(0, 20);
-            if (recentMovements.length === 0) {
-                movementTable.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--text-muted);">No stock movements recorded yet.</td></tr>`;
-                return;
-            }
+            if (recentMovements.length === 0) { movementTable.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--text-muted);">No stock movements recorded yet.</td></tr>`; return; }
             recentMovements.forEach(movement => {
                 const row = movementTable.insertRow();
                 let movementClass = 'movement-neutral', movementSymbol = '';
                 if (movement.quantityChange > 0) { movementClass = 'movement-positive'; movementSymbol = '+'; }
                 else if (movement.quantityChange < 0) { movementClass = 'movement-negative'; }
-                row.innerHTML = `
-                    <td>${movement.date}</td>
-                    <td>${movement.itemName}</td>
-                    <td>${movement.previousQuantity}</td>
-                    <td>${movement.newQuantity}</td>
-                    <td class="${movementClass}">${movementSymbol}${movement.quantityChange}</td>
-                    <td>${movement.type}</td>
-                    <td>${movement.notes || '-'}</td>
-                `;
+                row.innerHTML = `<td>${movement.date}</td><td>${movement.itemName}</td><td>${movement.previousQuantity}</td><td>${movement.newQuantity}</td><td class="${movementClass}">${movementSymbol}${movement.quantityChange}</td><td>${movement.type}</td><td>${movement.notes || '-'}</td>`;
             });
         }
         
         function checkAllAlerts() {
-            alertPanel.innerHTML = '';
-            alertItems.clear();
+            alertPanel.innerHTML = ''; alertItems.clear();
             currentItems.forEach(item => {
                 if (item.quantity === 0 && !alertItems.has(item.id)) { addAlert(`${item.name} is EMPTY (0 ${item.unit} left) - RESTOCK URGENTLY`, 'critical', item.id); alertItems.add(item.id); }
                 else if (item.quantity <= item.min_quantity && !alertItems.has(item.id)) { addAlert(`${item.name} is LOW (${item.quantity} ${item.unit} left, Minimum: ${item.min_quantity})`, 'critical', item.id); alertItems.add(item.id); }
@@ -944,19 +839,9 @@
         }
         
         function addAlert(message, type = 'warning', itemId = null) {
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert-item ${type}`;
+            const alertDiv = document.createElement('div'); alertDiv.className = `alert-item ${type}`;
             if (itemId) alertDiv.dataset.itemId = itemId;
-            alertDiv.innerHTML = `
-                <div class="alert-content">
-                    <div class="alert-title">
-                        ${type === 'critical' ? '<i class="fas fa-exclamation-circle"></i>' : type === 'warning' ? '<i class="fas fa-exclamation-triangle"></i>' : '<i class="fas fa-info-circle"></i>'}
-                        ${type === 'critical' ? 'Critical Alert' : type === 'warning' ? 'Warning' : 'Information'}
-                    </div>
-                    <div>${message}</div>
-                </div>
-                <button class="alert-dismiss" onclick="this.parentElement.remove(); updateAlertCount();">×</button>
-            `;
+            alertDiv.innerHTML = `<div class="alert-content"><div class="alert-title">${type === 'critical' ? '<i class="fas fa-exclamation-circle"></i>' : type === 'warning' ? '<i class="fas fa-exclamation-triangle"></i>' : '<i class="fas fa-info-circle"></i>'}${type === 'critical' ? 'Critical Alert' : type === 'warning' ? 'Warning' : 'Information'}</div><div>${message}</div></div><button class="alert-dismiss" onclick="this.parentElement.remove(); updateAlertCount();">×</button>`;
             alertPanel.appendChild(alertDiv);
         }
         
@@ -968,61 +853,39 @@
         function initializeEventListeners() {
             themeToggle.addEventListener('click', () => {
                 const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                document.documentElement.setAttribute('data-theme', newTheme);
-                currentTheme = newTheme;
-                const icon = themeToggle.querySelector('i');
-                icon.className = currentTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+                document.documentElement.setAttribute('data-theme', newTheme); currentTheme = newTheme;
+                const icon = themeToggle.querySelector('i'); icon.className = currentTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
                 localStorage.setItem('pantryTheme', newTheme);
             });
-            
             tabBtns.forEach(btn => {
                 btn.addEventListener('click', () => {
-                    const tabId = btn.dataset.tab;
-                    tabBtns.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
+                    const tabId = btn.dataset.tab; tabBtns.forEach(b => b.classList.remove('active')); btn.classList.add('active');
                     tabContents.forEach(content => {
                         content.classList.remove('active');
                         if (content.id === tabId) { content.classList.add('active'); if (tabId === 'usage-tracking') { setTimeout(() => { updateCharts(); }, 100); } }
                     });
                 });
             });
-            
             updateAllBtn.addEventListener('click', updateAllStocks);
             refreshBtn.addEventListener('click', async () => { loadingSpinner.style.display = 'block'; await loadData(); showAlert('Data refreshed successfully!', true); });
-            backupBtn.addEventListener('click', backupData);
-            printPdfBtn.addEventListener('click', printToPDF);
-            printCsvBtn.addEventListener('click', printToCSV);
-            printBtn.addEventListener('click', printPage);
-            clearDataBtn.addEventListener('click', clearHistoricalData);
+            backupBtn.addEventListener('click', backupData); printPdfBtn.addEventListener('click', printToPDF); printCsvBtn.addEventListener('click', printToCSV); printBtn.addEventListener('click', printPage); clearDataBtn.addEventListener('click', clearHistoricalData);
             restoreFile.addEventListener('change', (e) => { if (e.target.files.length > 0) { restoreData(e.target.files[0]); e.target.value = ''; } });
             monthSelect.addEventListener('change', renderMonthlyTable);
             itemSelect.addEventListener('change', () => { updateWeeklyChart(parseInt(itemSelect.value)); });
             checkAlertsBtn.addEventListener('click', checkAllAlerts);
-            
-            const locationDropdown = document.getElementById('locationDropdown');
-            if (locationDropdown) {
-                locationDropdown.value = CURRENT_LOCATION;
-                locationDropdown.addEventListener('change', function() {
-                    const newLocation = this.value;
-                    window.location.href = `?location=${newLocation}`;
-                });
-            }
         }
         
         function attachUpdateEventListeners() {
             document.querySelectorAll('.update-item-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
-                    const itemId = parseInt(this.dataset.id);
-                    const input = document.querySelector(`.quantity-input[data-id="${itemId}"]`);
-                    const value = parseInt(input.value);
+                    const itemId = parseInt(this.dataset.id); const input = document.querySelector(`.quantity-input[data-id="${itemId}"]`); const value = parseInt(input.value);
                     if (!isNaN(value) && value >= 0) { updateItemStock(itemId, value); } else { showAlert('Please enter a valid number', false); }
                 });
             });
             document.querySelectorAll('.quantity-input').forEach(input => {
                 input.addEventListener('keyup', function(e) {
                     if (e.key === 'Enter' && isAdminMode) {
-                        const itemId = parseInt(this.dataset.id);
-                        const value = parseInt(this.value);
+                        const itemId = parseInt(this.dataset.id); const value = parseInt(this.value);
                         if (!isNaN(value) && value >= 0) { updateItemStock(itemId, value); } else { showAlert('Please enter a valid number', false); }
                     }
                 });
@@ -1032,15 +895,10 @@
         function attachNoteEventListeners() {
             document.querySelectorAll('.add-note-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
-                    const itemId = parseInt(this.dataset.id);
-                    const input = document.getElementById(`noteInput-${itemId}`);
-                    const noteText = input.value;
+                    const itemId = parseInt(this.dataset.id); const input = document.getElementById(`noteInput-${itemId}`); const noteText = input.value;
                     if (addNote(itemId, noteText)) {
-                        input.value = '';
-                        const notesContainer = document.getElementById(`notesTable-${itemId}`);
-                        const item = currentItems.find(item => item.id === itemId);
-                        renderNotesTable(item, notesContainer);
-                        showAlert('Note added successfully!', true);
+                        input.value = ''; const notesContainer = document.getElementById(`notesTable-${itemId}`); const item = currentItems.find(item => item.id === itemId);
+                        renderNotesTable(item, notesContainer); showAlert('Note added successfully!', true);
                     } else { showAlert('Please enter a note', false); }
                 });
             });
@@ -1052,155 +910,108 @@
             if (itemIndex === -1) { showAlert('Item not found', false); return; }
             if (isNaN(newQuantity) || newQuantity < 0) { showAlert('Quantity must be a positive number', false); return; }
             
-            const previousQuantity = currentItems[itemIndex].quantity;
-            const maxQuantity = currentItems[itemIndex].max_quantity;
+            const previousQuantity = currentItems[itemIndex].quantity; const maxQuantity = currentItems[itemIndex].max_quantity;
             if (maxQuantity !== null && maxQuantity !== undefined && newQuantity > maxQuantity) { newQuantity = maxQuantity; }
             
             let movementType = 'adjustment';
-            if (newQuantity > previousQuantity) movementType = 'restock';
-            else if (newQuantity < previousQuantity) movementType = 'usage';
+            if (newQuantity > previousQuantity) movementType = 'restock'; else if (newQuantity < previousQuantity) movementType = 'usage';
             
-            currentItems[itemIndex].quantity = newQuantity;
-            currentItems[itemIndex].last_updated = formatDateTime(new Date());
-            
+            currentItems[itemIndex].quantity = newQuantity; currentItems[itemIndex].last_updated = formatDateTime(new Date());
             if (newQuantity !== previousQuantity) { addStockMovement(itemId, previousQuantity, newQuantity, movementType, `Manual update from ${previousQuantity} to ${newQuantity}`); }
             
-            renderStockList();
-            renderMovementTable();
-            checkAllAlerts();
-            updateCharts();
-            await saveData();
+            renderStockList(); renderMovementTable(); checkAllAlerts(); updateCharts(); await saveData();
             showAlert(`${currentItems[itemIndex].name} stock updated from ${previousQuantity} to ${newQuantity}`, true);
         }
         
         async function updateAllStocks() {
             if (!isAdminMode) { showAlert('Please login as admin to update stock', false); return; }
-            const inputs = document.querySelectorAll('.quantity-input');
-            let updatedCount = 0;
+            const inputs = document.querySelectorAll('.quantity-input'); let updatedCount = 0;
             for (const input of inputs) {
-                const itemId = parseInt(input.dataset.id);
-                const newQuantity = parseInt(input.value);
+                const itemId = parseInt(input.dataset.id); const newQuantity = parseInt(input.value);
                 if (!isNaN(newQuantity) && newQuantity >= 0) { await updateItemStock(itemId, newQuantity); updatedCount++; }
             }
             if (updatedCount > 0) { showAlert(`Updated ${updatedCount} item(s) successfully!`, true); } else { showAlert('No updates were made. Please check your input values.', false); }
         }
         
         function addStockMovement(itemId, previousQuantity, newQuantity, type, notes = '') {
-            const item = currentItems.find(item => item.id === itemId);
-            if (!item) return false;
+            const item = currentItems.find(item => item.id === itemId); if (!item) return false;
             const movement = { id: Date.now(), itemId: itemId, itemName: item.name, date: formatDateTime(new Date()), timestamp: new Date().getTime(), previousQuantity: previousQuantity, newQuantity: newQuantity, quantityChange: newQuantity - previousQuantity, type: type, notes: notes };
-            stockMovements.unshift(movement);
-            updateUsageData(itemId, movement);
-            return movement;
+            stockMovements.unshift(movement); updateUsageData(itemId, movement); return movement;
         }
         
         function updateUsageData(itemId, movement) {
-            const date = new Date(movement.timestamp);
-            const dateStr = date.toISOString().split('T')[0];
-            const weekStr = `${date.getFullYear()}-W${getWeekNumber(date)}`;
-            const monthStr = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
-            if (!usageData.daily[dateStr]) usageData.daily[dateStr] = {};
-            if (!usageData.daily[dateStr][itemId]) usageData.daily[dateStr][itemId] = 0;
-            usageData.daily[dateStr][itemId] += Math.abs(movement.quantityChange);
-            if (!usageData.weekly[weekStr]) usageData.weekly[weekStr] = {};
-            if (!usageData.weekly[weekStr][itemId]) usageData.weekly[weekStr][itemId] = 0;
-            usageData.weekly[weekStr][itemId] += Math.abs(movement.quantityChange);
-            if (!usageData.monthly[monthStr]) usageData.monthly[monthStr] = {};
-            if (!usageData.monthly[monthStr][itemId]) usageData.monthly[monthStr][itemId] = 0;
-            usageData.monthly[monthStr][itemId] += Math.abs(movement.quantityChange);
+            const date = new Date(movement.timestamp); const dateStr = date.toISOString().split('T')[0];
+            const weekStr = `${date.getFullYear()}-W${getWeekNumber(date)}`; const monthStr = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+            if (!usageData.daily[dateStr]) usageData.daily[dateStr] = {}; if (!usageData.daily[dateStr][itemId]) usageData.daily[dateStr][itemId] = 0; usageData.daily[dateStr][itemId] += Math.abs(movement.quantityChange);
+            if (!usageData.weekly[weekStr]) usageData.weekly[weekStr] = {}; if (!usageData.weekly[weekStr][itemId]) usageData.weekly[weekStr][itemId] = 0; usageData.weekly[weekStr][itemId] += Math.abs(movement.quantityChange);
+            if (!usageData.monthly[monthStr]) usageData.monthly[monthStr] = {}; if (!usageData.monthly[monthStr][itemId]) usageData.monthly[monthStr][itemId] = 0; usageData.monthly[monthStr][itemId] += Math.abs(movement.quantityChange);
         }
         
         function addNote(itemId, noteText) {
-            const item = currentItems.find(item => item.id === itemId);
-            if (!item) return false;
+            const item = currentItems.find(item => item.id === itemId); if (!item) return false;
             if (!noteText || noteText.trim() === '') return false;
             const note = { id: Date.now(), text: noteText.trim(), date: formatDateTime(new Date()), addedBy: isAdminMode ? 'Admin' : 'User' };
-            if (!item.notes) item.notes = [];
-            item.notes.unshift(note);
-            return true;
+            if (!item.notes) item.notes = []; item.notes.unshift(note); return true;
         }
         
         function deleteNote(itemId, noteId) {
-            const item = currentItems.find(item => item.id === itemId);
-            if (!item || !item.notes) return false;
-            const noteIndex = item.notes.findIndex(note => note.id === noteId);
-            if (noteIndex === -1) return false;
-            item.notes.splice(noteIndex, 1);
-            return true;
+            const item = currentItems.find(item => item.id === itemId); if (!item || !item.notes) return false;
+            const noteIndex = item.notes.findIndex(note => note.id === noteId); if (noteIndex === -1) return false;
+            item.notes.splice(noteIndex, 1); return true;
         }
         
         function populateItemSelect() {
             itemSelect.innerHTML = '';
             currentItems.forEach(item => {
-                const option = document.createElement('option');
-                option.value = item.id;
-                option.textContent = item.name;
-                itemSelect.appendChild(option);
+                const option = document.createElement('option'); option.value = item.id; option.textContent = item.name; itemSelect.appendChild(option);
             });
         }
         
         function updateCharts() {
             if(currentItems.length === 0) return;
             const selectedItemId = parseInt(itemSelect.value) || currentItems[0].id;
-            updateWeeklyChart(selectedItemId);
-            updateDistributionChart();
-            updateMonthlyChart();
+            updateWeeklyChart(selectedItemId); updateDistributionChart(); updateMonthlyChart();
         }
         
         function updateWeeklyChart(itemId) {
-            const ctx = document.getElementById('weeklyChart').getContext('2d');
-            const dates = [], usageDataPoints = [];
-            const today = new Date();
+            const ctx = document.getElementById('weeklyChart').getContext('2d'); const dates = [], usageDataPoints = []; const today = new Date();
             for (let i = 6; i >= 0; i--) {
-                const date = new Date(); date.setDate(today.getDate() - i);
-                const dateStr = date.toISOString().split('T')[0];
-                const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-                dates.push(dayNames[date.getDay()]);
-                const usage = usageData.daily[dateStr] && usageData.daily[dateStr][itemId] ? usageData.daily[dateStr][itemId] : 0;
-                usageDataPoints.push(usage);
+                const date = new Date(); date.setDate(today.getDate() - i); const dateStr = date.toISOString().split('T')[0];
+                const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']; dates.push(dayNames[date.getDay()]);
+                const usage = usageData.daily[dateStr] && usageData.daily[dateStr][itemId] ? usageData.daily[dateStr][itemId] : 0; usageDataPoints.push(usage);
             }
             if (weeklyChart) weeklyChart.destroy();
             weeklyChart = new Chart(ctx, {
-                type: 'line',
-                data: { labels: dates, datasets: [{ label: 'Daily Usage', data: usageDataPoints, borderColor: 'rgb(75, 192, 192)', backgroundColor: 'rgba(75, 192, 192, 0.2)', tension: 0.1, fill: true }] },
+                type: 'line', data: { labels: dates, datasets: [{ label: 'Daily Usage', data: usageDataPoints, borderColor: 'rgb(75, 192, 192)', backgroundColor: 'rgba(75, 192, 192, 0.2)', tension: 0.1, fill: true }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Last 7 Days Usage Trend' } }, scales: { y: { beginAtZero: true, title: { display: true, text: 'Units Used' } } } }
             });
         }
         
         function updateDistributionChart() {
-            const ctx = document.getElementById('distributionChart').getContext('2d');
-            const currentDate = new Date();
+            const ctx = document.getElementById('distributionChart').getContext('2d'); const currentDate = new Date();
             const currentMonth = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}`;
             const items = [], usageValues = [], backgroundColors = [];
             const colorPalette = ['rgba(255, 99, 132, 0.8)','rgba(54, 162, 235, 0.8)','rgba(255, 206, 86, 0.8)','rgba(75, 192, 192, 0.8)','rgba(153, 102, 255, 0.8)','rgba(255, 159, 64, 0.8)','rgba(199, 199, 199, 0.8)','rgba(83, 102, 255, 0.8)','rgba(255, 99, 255, 0.8)','rgba(50, 205, 50, 0.8)'];
             currentItems.forEach((item, index) => {
-                items.push(item.name);
-                const usage = usageData.monthly[currentMonth] && usageData.monthly[currentMonth][item.id] ? usageData.monthly[currentMonth][item.id] : 0;
-                usageValues.push(usage);
-                backgroundColors.push(colorPalette[index % colorPalette.length]);
+                items.push(item.name); const usage = usageData.monthly[currentMonth] && usageData.monthly[currentMonth][item.id] ? usageData.monthly[currentMonth][item.id] : 0;
+                usageValues.push(usage); backgroundColors.push(colorPalette[index % colorPalette.length]);
             });
             if (distributionChart) distributionChart.destroy();
             distributionChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: { labels: items, datasets: [{ label: 'Monthly Usage', data: usageValues, backgroundColor: backgroundColors, borderWidth: 1 }] },
+                type: 'doughnut', data: { labels: items, datasets: [{ label: 'Monthly Usage', data: usageValues, backgroundColor: backgroundColors, borderWidth: 1 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Monthly Usage Distribution' }, legend: { position: 'right' } } }
             });
         }
         
         function updateMonthlyChart() {
-            const ctx = document.getElementById('monthlyChart').getContext('2d');
-            const months = [], usageByMonth = {};
-            const currentDate = new Date();
+            const ctx = document.getElementById('monthlyChart').getContext('2d'); const months = [], usageByMonth = {}; const currentDate = new Date();
             const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
             currentItems.forEach(item => { usageByMonth[item.id] = { name: item.name, data: [] }; });
             for (let i = 2; i >= 0; i--) {
-                const date = new Date(); date.setMonth(date.getMonth() - i);
-                const monthStr = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
-                const monthName = `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
-                months.push(monthName);
+                const date = new Date(); date.setMonth(date.getMonth() - i); const monthStr = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+                const monthName = `${monthNames[date.getMonth()]} ${date.getFullYear()}`; months.push(monthName);
                 currentItems.forEach(item => {
-                    const usage = usageData.monthly[monthStr] && usageData.monthly[monthStr][item.id] ? usageData.monthly[monthStr][item.id] : 0;
-                    usageByMonth[item.id].data.push(usage);
+                    const usage = usageData.monthly[monthStr] && usageData.monthly[monthStr][item.id] ? usageData.monthly[monthStr][item.id] : 0; usageByMonth[item.id].data.push(usage);
                 });
             }
             if (monthlyChart) monthlyChart.destroy();
@@ -1210,65 +1021,39 @@
                 return { label: item.name, data: usageByMonth[item.id].data, backgroundColor: colors[index % colors.length], borderColor: colors[index % colors.length], borderWidth: 1 };
             });
             monthlyChart = new Chart(ctx, {
-                type: 'bar',
-                data: { labels: months, datasets: datasets },
+                type: 'bar', data: { labels: months, datasets: datasets },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Monthly Usage Comparison (Top 5 Items)' } }, scales: { x: { stacked: false }, y: { stacked: false, beginAtZero: true, title: { display: true, text: 'Units Used' } } } }
             });
         }
         
         function initializeMonthlySelect() {
-            monthSelect.innerHTML = '';
-            const months = Object.keys(usageData.monthly).sort();
+            monthSelect.innerHTML = ''; const months = Object.keys(usageData.monthly).sort();
             const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
             months.forEach(monthStr => {
-                const [year, month] = monthStr.split('-');
-                const monthName = `${monthNames[parseInt(month) - 1]} ${year}`;
-                const option = document.createElement('option');
-                option.value = monthStr; option.textContent = monthName;
-                monthSelect.appendChild(option);
+                const [year, month] = monthStr.split('-'); const monthName = `${monthNames[parseInt(month) - 1]} ${year}`;
+                const option = document.createElement('option'); option.value = monthStr; option.textContent = monthName; monthSelect.appendChild(option);
             });
-            const currentDate = new Date();
-            const currentMonth = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}`;
-            if (months.includes(currentMonth)) monthSelect.value = currentMonth;
-            else if (months.length > 0) monthSelect.value = months[months.length - 1];
+            const currentDate = new Date(); const currentMonth = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}`;
+            if (months.includes(currentMonth)) monthSelect.value = currentMonth; else if (months.length > 0) monthSelect.value = months[months.length - 1];
         }
         
         function renderMonthlyTable() {
-            monthlyTable.innerHTML = '';
-            const selectedMonth = monthSelect.value;
-            if (!selectedMonth || !usageData.monthly[selectedMonth]) {
-                monthlyTable.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--text-muted);">No data available for selected month.</td></tr>`;
-                return;
-            }
-            const [year, month] = selectedMonth.split('-');
-            const daysInMonth = new Date(parseInt(year), parseInt(month), 0).getDate();
+            monthlyTable.innerHTML = ''; const selectedMonth = monthSelect.value;
+            if (!selectedMonth || !usageData.monthly[selectedMonth]) { monthlyTable.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--text-muted);">No data available for selected month.</td></tr>`; return; }
+            const [year, month] = selectedMonth.split('-'); const daysInMonth = new Date(parseInt(year), parseInt(month), 0).getDate();
             currentItems.forEach(item => {
-                const usage = usageData.monthly[selectedMonth][item.id] || 0;
-                const avgDailyUsage = (usage / daysInMonth).toFixed(2);
-                let restockFrequency = 'N/A';
-                if (avgDailyUsage > 0) { const daysUntilEmpty = Math.floor(item.quantity / avgDailyUsage); restockFrequency = Math.max(1, daysUntilEmpty - 3); }
-                let needsAttention = false;
-                if (item.quantity <= item.min_quantity) needsAttention = true;
-                const row = monthlyTable.insertRow();
-                if (needsAttention) row.style.backgroundColor = 'rgba(247, 37, 133, 0.1)';
-                row.innerHTML = `
-                    <td>${item.name} ${needsAttention ? '<span style="color: var(--warning);">⚠️</span>' : ''}</td>
-                    <td>${item.unit || ''}</td>
-                    <td class="usage-cell">${(item.quantity + usage).toFixed(0)}</td>
-                    <td class="usage-cell">${item.quantity}</td>
-                    <td class="usage-cell ${usage > 0 ? 'usage-high' : ''}">${usage}</td>
-                    <td class="usage-cell">${avgDailyUsage}</td>
-                    <td class="usage-cell ${restockFrequency < 7 ? 'usage-high' : restockFrequency < 14 ? 'usage-medium' : 'usage-low'}">${restockFrequency} days</td>
-                `;
+                const usage = usageData.monthly[selectedMonth][item.id] || 0; const avgDailyUsage = (usage / daysInMonth).toFixed(2);
+                let restockFrequency = 'N/A'; if (avgDailyUsage > 0) { const daysUntilEmpty = Math.floor(item.quantity / avgDailyUsage); restockFrequency = Math.max(1, daysUntilEmpty - 3); }
+                let needsAttention = false; if (item.quantity <= item.min_quantity) needsAttention = true;
+                const row = monthlyTable.insertRow(); if (needsAttention) row.style.backgroundColor = 'rgba(247, 37, 133, 0.1)';
+                row.innerHTML = `<td>${item.name} ${needsAttention ? '<span style="color: var(--warning);">⚠️</span>' : ''}</td><td>${item.unit || ''}</td><td class="usage-cell">${(item.quantity + usage).toFixed(0)}</td><td class="usage-cell">${item.quantity}</td><td class="usage-cell ${usage > 0 ? 'usage-high' : ''}">${usage}</td><td class="usage-cell">${avgDailyUsage}</td><td class="usage-cell ${restockFrequency < 7 ? 'usage-high' : restockFrequency < 14 ? 'usage-medium' : 'usage-low'}">${restockFrequency} days</td>`;
             });
         }
         
         async function backupData() {
             if (!isAdminMode) { showAlert('Please login as admin to backup data', false); return; }
             const dataToExport = { items: currentItems, stockMovements: stockMovements, usageData: usageData, exportDate: new Date().toISOString(), version: '2.0', system: 'pantry' };
-            const dataStr = JSON.stringify(dataToExport, null, 2);
-            const dataBlob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(dataBlob);
+            const dataStr = JSON.stringify(dataToExport, null, 2); const dataBlob = new Blob([dataStr], { type: 'application/json' }); const url = URL.createObjectURL(dataBlob);
             const link = document.createElement('a'); link.href = url; link.download = `pantry_backup_${new Date().toISOString().split('T')[0]}.json`;
             document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url);
             showAlert('Backup created successfully!', true);
@@ -1303,10 +1088,8 @@
         }
         
         function printToPDF() {
-            const printWindow = window.open('', '_blank');
-            const formattedDate = formatDateTime(new Date());
-            const itemsNeedingRestock = currentItems.filter(item => item.quantity <= item.min_quantity * 1.5);
-            const recentMovements = stockMovements.slice(0, 10);
+            const printWindow = window.open('', '_blank'); const formattedDate = formatDateTime(new Date());
+            const itemsNeedingRestock = currentItems.filter(item => item.quantity <= item.min_quantity * 1.5); const recentMovements = stockMovements.slice(0, 10);
             printWindow.document.write(`
                 <!DOCTYPE html><html><head><title>Stock Report - ${new Date().toISOString().split('T')[0]}</title>
                 <style>body { font-family: Arial, sans-serif; margin: 20px; } h1 { color: #333; text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px; } h2 { color: #444; margin-top: 30px; border-bottom: 1px solid #ddd; padding-bottom: 5px; } .report-info { text-align: center; margin-bottom: 20px; color: #666; } table { width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 20px; } th, td { border: 1px solid #ddd; padding: 10px; text-align: left; } th { background-color: #f2f2f2; font-weight: bold; } .status-ok { color: green; font-weight: bold; } .status-low { color: orange; font-weight: bold; } .status-critical { color: red; font-weight: bold; } .alert-box { background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 5px; margin: 15px 0; } .alert-title { color: #856404; font-weight: bold; margin-bottom: 10px; } .footer { margin-top: 40px; font-size: 11px; color: #666; text-align: center; border-top: 1px solid #ddd; padding-top: 10px; } .no-print { display: none; } @media print { body { font-size: 12px; } h1 { font-size: 20px; } h2 { font-size: 16px; } }</style>
@@ -1340,16 +1123,14 @@
             csvContent += "No,Item,Unit,Current Quantity,Min Quantity,Max Quantity,Status,Last Updated\n";
             currentItems.forEach((item, index) => {
                 let status = "OK";
-                if (item.quantity <= item.min_quantity) status = "LOW";
-                else if (item.quantity <= item.min_quantity * 1.5) status = "MONITOR";
+                if (item.quantity <= item.min_quantity) status = "LOW"; else if (item.quantity <= item.min_quantity * 1.5) status = "MONITOR";
                 if (item.quantity === 0) status = "EMPTY";
                 const maxQty = (item.max_quantity === null || item.max_quantity === undefined) ? "No Limit" : item.max_quantity;
                 csvContent += [index + 1, `"${item.name}"`, `"${item.unit || ''}"`, item.quantity, item.min_quantity, maxQty, status, `"${item.last_updated}"`].join(",") + "\n";
             });
             csvContent += "\n\nRECENT STOCK MOVEMENTS\nDate,Item,Previous Qty,New Qty,Change,Type,Notes\n";
             stockMovements.slice(0, 20).forEach(movement => { csvContent += [`"${movement.date}"`, `"${movement.itemName}"`, movement.previousQuantity, movement.newQuantity, movement.quantityChange > 0 ? `+${movement.quantityChange}` : movement.quantityChange, movement.type, `"${movement.notes || ''}"`].join(",") + "\n"; });
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement('a'); link.href = encodedUri; link.download = `stock_report_${new Date().toISOString().split('T')[0]}.csv`;
+            const encodedUri = encodeURI(csvContent); const link = document.createElement('a'); link.href = encodedUri; link.download = `stock_report_${new Date().toISOString().split('T')[0]}.csv`;
             document.body.appendChild(link); link.click(); document.body.removeChild(link);
             showAlert('CSV report generated successfully!', true);
         }
@@ -1388,7 +1169,7 @@
           const newItem = { name: name, category: category, code: code, quantity: quantity, unit: unit, min_quantity: min_quantity };
 
           try {
-            const response = await fetch(`${API_BASE}/save?mosque=al-khair&location=${CURRENT_LOCATION}`, {
+            const response = await fetch(`${API_BASE}/save?mosque=${CURRENT_MOSQUE}&location=${CURRENT_LOCATION}`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
               body: JSON.stringify({ items: [newItem] })
