@@ -642,7 +642,7 @@
 </head>
 <body>
     <div class="print-header">
-        <h1 class="print-title">Masjid Al-Iman - Stock Report</h1>
+        <h1 class="print-title">Masjid Al-Khair - Stock Report</h1>
         <p class="print-subtitle">Stock Management System | Generated: <span id="printDate"></span></p>
     </div>
     
@@ -711,6 +711,10 @@
                         </button>
                         <button class="btn btn-secondary" id="refreshBtn">
                             <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                        <!-- THIS IS WHERE THE NEW BUTTON LIVES -->
+                        <button class="btn btn-success" onclick="openAddModal()">
+                            <i class="fas fa-plus"></i> Add Item
                         </button>
                     </div>
                 </div>
@@ -855,7 +859,7 @@
         </div>
         
         <div class="print-footer">
-            <p>Masjid Al-Iman Stock Management System | Page <span class="pageNumber"></span></p>
+            <p>Masjid Al-Khair Stock Management System | Page <span class="pageNumber"></span></p>
             <p>Report generated on <span id="printFooterDate"></span> | For official use only</p>
         </div>
     </div>
@@ -892,9 +896,46 @@
             </form>
         </div>
     </div>
+
+    <!-- ADD ITEM MODAL -->
+    <div id="addItemModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
+      <div style="background: var(--card-bg); color: var(--text-color); padding: 25px 30px; border-radius: 16px; width: 90%; max-width: 400px; text-align: left; border: 1px solid var(--border-color); box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+        <h3 style="margin-top: 0; font-size: 1.5rem; margin-bottom: 20px;">Add New Item</h3>
+        
+        <label style="display: block; margin-top: 10px; font-weight: 600;">Item Name:</label>
+        <input type="text" id="newItemName" class="form-control" style="margin-top: 4px;" placeholder="e.g. Rice Cooker">
+        
+        <label style="display: block; margin-top: 15px; font-weight: 600;">Category:</label>
+        <input type="text" id="newItemCategory" class="form-control" style="margin-top: 4px;" placeholder="e.g. Dining">
+        
+        <label style="display: block; margin-top: 15px; font-weight: 600;">Code (Optional):</label>
+        <input type="text" id="newItemCode" class="form-control" style="margin-top: 4px;" placeholder="e.g. SKP-CUP-01">
+        
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+          <div style="flex: 1;">
+            <label style="display: block; font-weight: 600;">Quantity:</label>
+            <input type="number" id="newItemQty" class="form-control" style="margin-top: 4px;" value="1">
+          </div>
+          <div style="flex: 1;">
+            <label style="display: block; font-weight: 600;">Unit:</label>
+            <input type="text" id="newItemUnit" class="form-control" style="margin-top: 4px;" value="pcs">
+          </div>
+          <div style="flex: 1;">
+            <label style="display: block; font-weight: 600;">Min Qty:</label>
+            <input type="number" id="newItemMinQty" class="form-control" style="margin-top: 4px;" value="0">
+          </div>
+        </div>
+
+        <div style="margin-top: 25px; display: flex; justify-content: flex-end; gap: 10px;">
+          <button onclick="document.getElementById('addItemModal').style.display='none'" class="btn btn-secondary">Cancel</button>
+          <button onclick="submitNewItem()" class="btn btn-success">Save Item</button>
+        </div>
+      </div>
+    </div>
+
     <script>
         const API_BASE = 'https://frosty-frog-9bafpantry.dz-projects1234.workers.dev/api/pantry';
-        // --- LOCATION SWITCHER ---
+        
         function getCurrentLocation() {
             const params = new URLSearchParams(window.location.search);
             const loc = params.get('location');
@@ -903,7 +944,7 @@
 
         const CURRENT_LOCATION = getCurrentLocation();
         console.log('📍 Current location:', CURRENT_LOCATION);
-        // -------------------------
+        
         const DEFAULT_USERNAME = "Offline_Admin_Disabled";
         const DEFAULT_PASSWORD = "Offline_Password_Disabled";
         
@@ -978,6 +1019,11 @@
             }
             
             authToken = localStorage.getItem('pantryAuthToken');
+            if (authToken) {
+                // If token exists, we assume admin mode for UI purposes
+                isAdminMode = true;
+                toggleAdminMode(true);
+            }
             
             updateLiveTime();
             setInterval(updateLiveTime, 1000);
@@ -990,6 +1036,14 @@
         
         async function testApiConnection() {
             try {
+                // If no token, we are logged out. Just assume online and skip the check.
+                if (!authToken) {
+                    isOnline = true;
+                    apiStatus.className = 'api-status connected';
+                    apiStatus.innerHTML = '<i class="fas fa-plug"></i> API: Connected';
+                    return; 
+                }
+
                 const response = await fetch(`${API_BASE}/health`, {
                     method: 'GET',
                     headers: getAuthHeaders()
@@ -1031,8 +1085,7 @@
                     authToken = null;
                     isAdminMode = false;
                     toggleAdminMode(false);
-                    loginModal.classList.add('active');
-                    showAlert('Session expired. Please login again.', false);
+                    // REMOVED: loginModal.classList.add('active'); 
                     return null;
                 }
                 
@@ -1151,7 +1204,7 @@
         async function loadData() {
             loadingSpinner.style.display = 'block';
             let apiData = null;
-            if (isOnline) {
+            if (isOnline && authToken) {
                 apiData = await loadFromApi();
             }
             
@@ -1279,11 +1332,13 @@
                 const maxValue = (item.name === "Susu Pekat" || item.name === "Susu Cair") ? "" : (item.max_quantity || 100);
                 const maxAttr = (item.name === "Susu Pekat" || item.name === "Susu Cair") ? "" : `max="${maxValue}"`;
                 
+                // Added Delete Button inside the item-info div for better visibility
                 listItem.innerHTML = `
                     <div class="item-info">
                         <div class="item-name">${item.name}</div>
-                        <div class="item-unit">${item.unit || ''}</div>
+                        <div class="item-unit">${item.unit || ''} ${item.code ? '| ' + item.code : ''}</div>
                         <div class="item-updated"><i class="fas fa-clock"></i> ${item.last_updated || 'Not updated yet'}</div>
+                        ${isAdminMode ? `<button onclick="deleteItem(${item.id})" style="background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid #ef4444; padding: 6px 12px; border-radius: 8px; cursor: pointer; margin-top: 8px; width: fit-content;"><i class="fas fa-trash"></i> Delete</button>` : ''}
                     </div>
                     <div class="current-stock">
                         <div class="stock-quantity">${item.quantity}</div>
@@ -1470,24 +1525,24 @@
             });
             
             checkAlertsBtn.addEventListener('click', checkAllAlerts);
-            // --- LOCATION DROPDOWN SWITCHER ---
-           const locationDropdown = document.getElementById('locationDropdown');
-           if (locationDropdown) {
-               locationDropdown.value = CURRENT_LOCATION;
-               locationDropdown.addEventListener('change', function() {
-                   const newLocation = this.value;
-                   window.location.href = `?location=${newLocation}`;
-               });
-           }
-           // ---------------------------------
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', () => {
-                    if (confirm('Bro, are you sure you want to log out?')) {
-                        localStorage.clear();
-                        window.location.href = 'login.html';
-                    }
+            
+            const locationDropdown = document.getElementById('locationDropdown');
+            if (locationDropdown) {
+                locationDropdown.value = CURRENT_LOCATION;
+                locationDropdown.addEventListener('change', function() {
+                    const newLocation = this.value;
+                    window.location.href = `?location=${newLocation}`;
                 });
             }
+            
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            if (confirm('Bro, are you sure you want to log out?')) {
+                localStorage.clear();
+                window.location.replace(window.location.pathname);
+            }
+        });
+    }
             
             closeLoginModal.addEventListener('click', () => {
                 loginModal.classList.remove('active');
@@ -1534,22 +1589,14 @@
             isAdminMode = enable;
             viewModeIndicator.classList.toggle('active', !enable);
             
-            const updateButtons = document.querySelectorAll('.update-btn:not(#updateAllBtn)');
-            const quantityInputs = document.querySelectorAll('.quantity-input');
-            const noteInputs = document.querySelectorAll('.note-input');
-            const addNoteButtons = document.querySelectorAll('.add-note-btn');
-            const deleteNoteButtons = document.querySelectorAll('.delete-note-btn');
-            
-            updateButtons.forEach(btn => btn.disabled = !enable);
-            updateAllBtn.disabled = !enable;
-            quantityInputs.forEach(input => input.disabled = !enable);
-            noteInputs.forEach(input => input.disabled = !enable);
-            addNoteButtons.forEach(btn => btn.disabled = !enable);
-            deleteNoteButtons.forEach(btn => btn.disabled = !enable);
-            
-            localStorage.setItem('pantryAdminMode', enable.toString());
+            // NEW: Hide the logout button if not in admin mode
+            if (logoutBtn) {
+                logoutBtn.style.display = enable ? 'flex' : 'none';
+            }
+
+            renderStockList(); // Re-render to show/hide delete buttons
         }
-        
+                               
         function attachUpdateEventListeners() {
             document.querySelectorAll('.update-item-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
@@ -1619,7 +1666,7 @@
         async function updateItemStock(itemId, newQuantity) {
             if (!isAdminMode) {
                 showAlert('Please login as admin to update stock', false);
-                document.getElementById('loginModal').classList.add('active'); // 👈 opens login popup
+                document.getElementById('loginModal').classList.add('active');
                 return;
             }
             
@@ -1663,7 +1710,7 @@
         async function updateAllStocks() {
             if (!isAdminMode) {
                 showAlert('Please login as admin to update stock', false);
-                document.getElementById('loginModal').classList.add('active'); // 👈 opens login popup
+                document.getElementById('loginModal').classList.add('active');
                 return;
             }
             
@@ -1758,8 +1805,8 @@
             });
         }
         
-            function updateCharts() {
-            if (!currentItems || currentItems.length === 0) return; // <--- ADD THIS LINE
+        function updateCharts() {
+            if(currentItems.length === 0) return;
             const selectedItemId = parseInt(itemSelect.value) || currentItems[0].id;
             updateWeeklyChart(selectedItemId);
             updateDistributionChart();
@@ -1952,7 +1999,7 @@
         async function clearHistoricalData() {
             if (!isAdminMode) {
                 showAlert('Please login as admin to clear data', false);
-                document.getElementById('loginModal').classList.add('active'); // 👈 ADD THIS
+                document.getElementById('loginModal').classList.add('active'); 
                 return;
             }
             if (confirm('Are you sure you want to clear all historical movement data? This will not affect current stock levels.')) {
@@ -1977,7 +2024,7 @@
                 <!DOCTYPE html>
                 <html>
                 <head>
-                    <title>Masjid Al-Iman Stock Report - ${currentDate.toISOString().split('T')[0]}</title>
+                    <title>Masjid Al-Khair Stock Report - ${currentDate.toISOString().split('T')[0]}</title>
                     <style>
                         body { font-family: Arial, sans-serif; margin: 20px; }
                         h1 { color: #333; text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px; }
@@ -2000,7 +2047,7 @@
                     <h1>Masjid Al-Iman - Stock Report</h1>
                     <div class="report-info">
                         <p><strong>Generated:</strong> ${formattedDate}</p>
-                        <p><strong>Location:</strong> Masjid Al-Iman - Stock Room</p>
+                        <p><strong>Location:</strong> Masjid Al-Khair - Stock Room</p>
                         <p><strong>Total Items Tracked:</strong> ${currentItems.length}</p>
                     </div>
                     
@@ -2039,7 +2086,7 @@
                     ` : '<p>No recent stock movements recorded.</p>'}
                     
                     <div class="footer">
-                        <p>Masjid Al-Iman Stock Management System - Report generated on ${formattedDate}</p>
+                        <p>Masjid Al-Khair Stock Management System - Report generated on ${formattedDate}</p>
                         <p>For any discrepancies, please contact the administrator.</p>
                     </div>
                     
@@ -2056,9 +2103,9 @@
         
         function printToCSV() {
             let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "MASJID AL-IMAN STOCK REPORT\n";
+            csvContent += "MASJID AL-KHAIR STOCK REPORT\n";
             csvContent += `Generated: ${formatDateTime(new Date())}\n`;
-            csvContent += "Location: Masjid Al-Iman - Stock Room\n\n";
+            csvContent += "Location: Masjid Al-Khair - Stock Room\n\n";
             csvContent += "CURRENT STOCK LEVELS\n";
             csvContent += "No,Item,Unit,Current Quantity,Min Quantity,Max Quantity,Status,Last Updated\n";
             currentItems.forEach((item, index) => {
@@ -2102,6 +2149,106 @@
                 successAlert.style.display = 'none';
                 errorAlert.style.display = 'none';
             }, 3000);
+        }
+
+        // --- PART 2: ADD ITEM LOGIC ---
+        function openAddModal() {
+          document.getElementById('newItemName').value = '';
+          document.getElementById('newItemCategory').value = '';
+          document.getElementById('newItemCode').value = '';
+          document.getElementById('newItemQty').value = '1';
+          document.getElementById('newItemUnit').value = 'pcs';
+          document.getElementById('newItemMinQty').value = '0';
+          document.getElementById('addItemModal').style.display = 'flex';
+        }
+
+        async function submitNewItem() {
+          const name = document.getElementById('newItemName').value.trim();
+          const category = document.getElementById('newItemCategory').value.trim() || 'Other';
+          const code = document.getElementById('newItemCode').value.trim() || 'Not Applicable';
+          const quantity = parseInt(document.getElementById('newItemQty').value) || 0;
+          const unit = document.getElementById('newItemUnit').value.trim() || 'pcs';
+          const min_quantity = parseInt(document.getElementById('newItemMinQty').value) || 0;
+
+          if (!name) {
+            alert("Item Name is required!");
+            return;
+          }
+
+          // FIXED: Correct token name
+          const token = localStorage.getItem('pantryAuthToken'); 
+          
+          if (!token) {
+            alert("You must be logged in as Admin to do this.");
+            return;
+          }
+
+          const newItem = {
+            name: name,
+            category: category,
+            code: code,
+            quantity: quantity,
+            unit: unit,
+            min_quantity: min_quantity
+          };
+
+          try {
+            // FIXED: Correct API_BASE URL and location
+            const response = await fetch(`${API_BASE}/save?mosque=al-iman&location=${CURRENT_LOCATION}`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({ items: [newItem] })
+            });
+
+            if (response.ok) {
+              alert("Item added successfully!");
+              document.getElementById('addItemModal').style.display = 'none';
+              loadData(); 
+            } else {
+              alert("Failed to add item. Check console.");
+              console.error(await response.text());
+            }
+          } catch (error) {
+            console.error("Error adding item:", error);
+            alert("Network error.");
+          }
+        }
+
+        // --- PART 2: DELETE ITEM LOGIC ---
+        async function deleteItem(itemId) {
+          if (!confirm("Are you sure you want to delete this item? This cannot be undone.")) {
+            return;
+          }
+
+          const token = localStorage.getItem('pantryAuthToken');
+          if (!token) {
+            alert("You must be logged in to delete items.");
+            return;
+          }
+
+          try {
+            const response = await fetch(`${API_BASE}/delete`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({ itemId: itemId })
+            });
+
+            if (response.ok) {
+              alert("Item deleted!");
+              loadData(); 
+            } else {
+              alert("Failed to delete item.");
+            }
+          } catch (error) {
+            console.error("Error deleting:", error);
+            alert("Network error.");
+          }
         }
     </script>
 </body>
