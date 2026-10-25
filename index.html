@@ -495,33 +495,56 @@
             // Apply auth state immediately
             applyAuthState();
 
-            // Login Button
+            // Login Button (SECURED)
             const loginBtn = document.getElementById('loginBtn');
-            if (loginBtn) {
-                loginBtn.addEventListener('click', async () => {
-                    const pwd = document.getElementById('loginPassword').value;
-                    const errEl = document.getElementById('loginError');
-                    errEl.style.display = 'none';
+            const passwordInput = document.getElementById('loginPassword');
+            const errEl = document.getElementById('loginError');
 
-                    try {
-                        const res = await fetch(`${API_BASE}/login`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ password: pwd })
-                        });
+            async function attemptLogin() {
+                const pwd = passwordInput.value;
+                errEl.style.display = 'none';
 
-                        if (res.ok) {
-                            const data = await res.json();
-                            localStorage.setItem(AUTH_TOKEN_KEY, data.token || 'true');
-                            document.getElementById('loginPassword').value = '';
-                            applyAuthState(); 
-                            if (typeof loadData === 'function') loadData(); 
-                        } else {
-                            errEl.style.display = 'block';
-                        }
-                    } catch (e) {
-                        console.error("Login error:", e);
+                if (!pwd) {
+                    errEl.textContent = "❌ Please enter a password.";
+                    errEl.style.display = 'block';
+                    return;
+                }
+
+                try {
+                    // We ask the Cloudflare Worker to check the password
+                    const res = await fetch(`${API_BASE}/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ password: pwd })
+                    });
+
+                    if (res.ok) {
+                        const data = await res.json();
+                        localStorage.setItem(AUTH_TOKEN_KEY, data.token || 'true');
+                        passwordInput.value = '';
+                        applyAuthState(); 
+                        if (typeof loadData === 'function') loadData(); 
+                    } else {
+                        errEl.textContent = "❌ Wrong password. Try again.";
                         errEl.style.display = 'block';
+                    }
+                } catch (e) {
+                    console.error("Login error:", e);
+                    errEl.textContent = "❌ Network error. Please try again.";
+                    errEl.style.display = 'block';
+                }
+            }
+
+            if (loginBtn) {
+                loginBtn.addEventListener('click', attemptLogin);
+            }
+
+            // This makes the "Enter" key work properly!
+            if (passwordInput) {
+                passwordInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault(); // Stops the page from reloading
+                        attemptLogin();
                     }
                 });
             }
