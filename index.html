@@ -1196,7 +1196,7 @@
         async function loadData() {
             loadingSpinner.style.display = 'block';
             let apiData = null;
-            if (isOnline) {
+            if (isOnline && authToken) {
                 apiData = await loadFromApi();
             }
             
