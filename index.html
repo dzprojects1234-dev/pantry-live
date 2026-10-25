@@ -1036,6 +1036,14 @@
         
         async function testApiConnection() {
             try {
+                // If no token, we are logged out. Just assume online and skip the check.
+                if (!authToken) {
+                    isOnline = true;
+                    apiStatus.className = 'api-status connected';
+                    apiStatus.innerHTML = '<i class="fas fa-plug"></i> API: Connected';
+                    return; 
+                }
+
                 const response = await fetch(`${API_BASE}/health`, {
                     method: 'GET',
                     headers: getAuthHeaders()
