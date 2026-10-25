@@ -1532,7 +1532,7 @@
         logoutBtn.addEventListener('click', () => {
             if (confirm('Bro, are you sure you want to log out?')) {
                 localStorage.clear();
-                window.location.href = window.location.pathname;
+                window.location.replace(window.location.pathname);
             }
         });
     }
@@ -1578,11 +1578,17 @@
             });
         }
         
-        function toggleAdminMode(enable) {
+   function toggleAdminMode(enable) {
             isAdminMode = enable;
             viewModeIndicator.classList.toggle('active', !enable);
+            
+            // NEW: Hide the logout button if not in admin mode
+            if (logoutBtn) {
+                logoutBtn.style.display = enable ? 'flex' : 'none';
+            }
+            
             renderStockList(); // Re-render to show/hide delete buttons
-        }
+    }
         
         function attachUpdateEventListeners() {
             document.querySelectorAll('.update-item-btn').forEach(btn => {
