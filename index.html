@@ -935,6 +935,70 @@
     </div>
 
     <script>
+        // ===== AUTH CHECK (single source of truth) =====
+const AUTH_TOKEN_KEY = 'pantryAuthToken';
+
+function isLoggedIn() {
+    const token = localStorage.getItem(AUTH_TOKEN_KEY);
+    return token !== null && token !== '' && token !== 'undefined';
+}
+
+function showLoginScreen() {
+    document.getElementById('appContent').style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'block';
+    const err = document.getElementById('loginError');
+    if (err) err.style.display = 'none';
+}
+
+function showApp() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('appContent').style.display = 'block';
+}
+
+function applyAuthState() {
+    if (isLoggedIn()) {
+        showApp();
+        // Show admin-only buttons
+        document.querySelectorAll('.admin-only').forEach(el => el.style.display = '');
+    } else {
+        showLoginScreen();
+        // Hide admin-only buttons
+        document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+    }
+}
+
+// Run on page load
+window.addEventListener('DOMContentLoaded', applyAuthState);
+
+// ===== LOGIN HANDLER =====
+document.getElementById('loginBtn').addEventListener('click', async () => {
+    const pwd = document.getElementById('loginPassword').value;
+    const errEl = document.getElementById('loginError');
+    errEl.style.display = 'none';
+
+    try {
+        // Assuming your Worker uses /login and expects { password: "..." }
+        const res = await fetch('https://frosty-frog-9bafpantry.dz-projects1234.workers.dev/api/pantry/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password: pwd })
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            // Save the token (or 'true' if your backend doesn't send a specific token)
+            localStorage.setItem(AUTH_TOKEN_KEY, data.token || 'true');
+            document.getElementById('loginPassword').value = '';
+            applyAuthState();
+            if (typeof loadInventory === 'function') loadInventory(); // reload data
+        } else {
+            errEl.style.display = 'block';
+        }
+    } catch (e) {
+        console.error("Login error:", e);
+        errEl.style.display = 'block';
+    }
+});
         const API_BASE = 'https://frosty-frog-9bafpantry.dz-projects1234.workers.dev/api/pantry';
         
         function getCurrentLocation() {
@@ -2251,6 +2315,19 @@
             alert("Network error.");
           }
         }
+    // Force the Logout button to use our new logic
+    const logoutBtnElement = document.getElementById('logoutBtn');
+    if (logoutBtnElement) {
+        // Clone the button to remove old event listeners
+        const newLogoutBtn = logoutBtnElement.cloneNode(true);
+        logoutBtnElement.parentNode.replaceChild(newLogoutBtn, logoutBtnElement);
+    
+    // Add our new listener
+    newLogoutBtn.addEventListener('click', () => {
+        localStorage.removeItem(AUTH_TOKEN_KEY);
+        applyAuthState();
+    });
+}    
     </script>
 </div> <!-- This closes the appContent box -->
 
