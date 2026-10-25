@@ -489,7 +489,6 @@
                 document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
                 isAdminMode = false;
             }
-            if (typeof renderStockList === 'function') renderStockList(); // Refresh buttons if data exists
         }
 
         window.addEventListener('DOMContentLoaded', () => {
