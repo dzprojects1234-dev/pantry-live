@@ -449,14 +449,14 @@
             <input type="number" id="newItemMinQty" class="form-control" style="margin-top: 4px;" value="0">
           </div>
             <!-- PASTE IT RIGHT HERE 👇 -->
-          <div class="form-group">
-             <label for="newItemLocation">Location *</label>
-             <select id="newItemLocation" class="form-control">
-                <option value="pantry">Pantry</option>
-                <option value="basement">Basement</option>
-             </select>
-         </div>
-        </div>
+            <div style="flex: 1;">
+              <label style="display: block; font-weight: 600;">Location:</label>
+              <select id="newItemLocation" class="form-control" style="margin-top: 4px;">
+                  <option value="pantry">Pantry</option>
+                  <option value="basement">Basement</option>
+              </select>
+            </div>
+     </div>
 
         <div style="margin-top: 25px; display: flex; justify-content: flex-end; gap: 10px;">
           <button onclick="document.getElementById('addItemModal').style.display='none'" class="btn btn-secondary">Cancel</button>
