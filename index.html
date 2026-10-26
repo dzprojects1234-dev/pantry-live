@@ -825,7 +825,22 @@
                 
                 listItem.innerHTML = `
                     <div class="item-info">
-                        <div class="item-name">${item.name}</div>
+                    <div class="item-name">
+                        ${item.name}
+                        ${(() => {
+                            const loc = (item.location || '').toLowerCase();
+                            const cat = (item.category || '').toLowerCase();
+                            if (loc === 'pantry') {
+                                return '<span class="loc-badge loc-badge-pantry">Pantry</span>';
+                            }
+                            if (loc === 'basement') {
+                                const isHardware = cat.includes('hardware') || cat.includes('tool') || cat.includes('utensil') || cat.includes('cleaning');
+                                const cls = isHardware ? 'loc-badge-basement-hardware' : 'loc-badge-basement';
+                                return `<span class="loc-badge ${cls}">Basement</span>`;
+                            }
+                            return '';
+                            })()}
+                     </div>
                         <div class="item-unit">${item.unit || ''} ${item.code ? '| ' + item.code : ''}</div>
                         <div class="item-updated"><i class="fas fa-clock"></i> ${item.last_updated || 'Not updated yet'}</div>
                         ${isAdminMode ? `<button onclick="deleteItem(${item.id})" class="admin-only" style="background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid #ef4444; padding: 6px 12px; border-radius: 8px; cursor: pointer; margin-top: 8px; width: fit-content;"><i class="fas fa-trash"></i> Delete</button>` : ''}
