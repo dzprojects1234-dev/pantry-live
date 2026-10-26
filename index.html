@@ -1161,15 +1161,16 @@
           const quantity = parseInt(document.getElementById('newItemQty').value) || 0;
           const unit = document.getElementById('newItemUnit').value.trim() || 'pcs';
           const min_quantity = parseInt(document.getElementById('newItemMinQty').value) || 0;
+          const chosenLocation = document.getElementById('newItemLocation').value || 'pantry';
 
           if (!name) { alert("Item Name is required!"); return; }
           const token = localStorage.getItem(AUTH_TOKEN_KEY); 
           if (!token) { alert("You must be logged in as Admin to do this."); return; }
 
-          const newItem = { name: name, category: category, code: code, quantity: quantity, unit: unit, min_quantity: min_quantity };
+          const newItem = { name: name, category: category, code: code, quantity: quantity, unit: unit, min_quantity: min_quantity, location: chosenLocation };
 
           try {
-            const response = await fetch(`${API_BASE}/save?mosque=${CURRENT_MOSQUE}&location=${CURRENT_LOCATION}`, {
+            const response = await fetch(`${API_BASE}/save?mosque=${CURRENT_MOSQUE}&location=${chosenLocation}`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
               body: JSON.stringify({ items: [newItem] })
