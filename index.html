@@ -761,6 +761,23 @@
             localStorage.setItem('pantryStockData', JSON.stringify(dataToSave));
             return apiSaved || !isOnline;
         }
+
+        function sortItems(mode) {
+            if (!currentItems || currentItems.length === 0) return;
+            if (mode === 'az') {
+                currentItems.sort((a, b) => a.name.localeCompare(b.name));
+            } else if (mode === 'za') {
+               currentItems.sort((a, b) => b.name.localeCompare(a.name));
+            } else if (mode === 'location') {
+                currentItems.sort((a, b) => {
+                    const la = (a.location || '').toLowerCase();
+                    const lb = (b.location || '').toLowerCase();
+                    if (la !== lb) return la.localeCompare(lb);
+                    return a.name.localeCompare(b.name);
+              });
+            }
+            renderStockList();
+        }
         
         function renderStockList() {
             stockList.innerHTML = '';
