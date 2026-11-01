@@ -984,21 +984,32 @@
         
         async function updateItemStock(itemId, newQuantity) {
             if (!isAdminMode) { showAlert('Please login as admin to update stock', false); return; }
-            const itemIndex = currentItems.findIndex(item => item.id === itemId);
-            if (itemIndex === -1) { showAlert('Item not found', false); return; }
+            const item = currentItems.find(item => item.id === itemId);
+            if (!item) { showAlert('Item not found', false); return; }
             if (isNaN(newQuantity) || newQuantity < 0) { showAlert('Quantity must be a positive number', false); return; }
             
-            const previousQuantity = currentItems[itemIndex].quantity; const maxQuantity = currentItems[itemIndex].max_quantity;
+            const previousQuantity = item.quantity; 
+            const maxQuantity = item.max_quantity;
             if (maxQuantity !== null && maxQuantity !== undefined && newQuantity > maxQuantity) { newQuantity = maxQuantity; }
             
             let movementType = 'adjustment';
             if (newQuantity > previousQuantity) movementType = 'restock'; else if (newQuantity < previousQuantity) movementType = 'usage';
             
-            currentItems[itemIndex].quantity = newQuantity; currentItems[itemIndex].last_updated = formatDateTime(new Date());
-            if (newQuantity !== previousQuantity) { addStockMovement(itemId, previousQuantity, newQuantity, movementType, `Manual update from ${previousQuantity} to ${newQuantity}`); }
+            // Kemaskini nilai dan masa HANYA untuk item yang terlibat ini sahaja
+            item.quantity = newQuantity; 
+            item.last_updated = formatDateTime(new Date());
             
-            renderStockList(); renderMovementTable(); checkAllAlerts(); updateCharts(); await saveData();
-            showAlert(`${currentItems[itemIndex].name} stock updated from ${previousQuantity} to ${newQuantity}`, true);
+            if (newQuantity !== previousQuantity) { 
+                addStockMovement(itemId, previousQuantity, newQuantity, movementType, `Manual update from ${previousQuantity} to ${newQuantity}`); 
+            }
+            
+            renderStockList(); 
+            renderMovementTable(); 
+            checkAllAlerts(); 
+            updateCharts(); 
+            await saveData();
+            
+            showAlert(`${item.name} stock updated from ${previousQuantity} to ${newQuantity}`, true);
         }
         
         async function updateAllStocks() {
