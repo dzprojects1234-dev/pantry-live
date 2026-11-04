@@ -306,16 +306,43 @@
         const MOSQUE_ID = 'test'; 
 
         // --- DATA FOR CHART & TABLE (Static for demo) ---
-        const defaultData = [
-            { month: "Aug 2025", elecBill: 42.00, gasBill: 3.50, waterBill: 25.00, totalBill: 75.00 },
-            { month: "Sep 2025", elecBill: 38.50, gasBill: 3.50, waterBill: 25.00, totalBill: 72.00 },
-            { month: "Oct 2025", elecBill: 34.00, gasBill: 1.50, waterBill: 15.00, totalBill: 55.00 },
-            { month: "Nov 2025", elecBill: 43.00, gasBill: 1.50, waterBill: 18.50, totalBill: 68.00 },
-            { month: "Dec 2025", elecBill: 33.50, gasBill: 2.20, waterBill: 19.80, totalBill: 60.50 },
-            { month: "Jan 2026", elecBill: 36.75, gasBill: 2.20, waterBill: 20.38, totalBill: 74.88 }
-        ];
+                // --- DATA FOR CHART & TABLE (Dynamic from API) ---
+        let currentData = [];
+        let currentScale = 1;
 
-        let currentData = defaultData;
+        // Fungsi baru untuk tarik data dari Cloudflare Worker
+        async function fetchBillData() {
+            try {
+                // Tarik dari API. Guna MOSQUE_ID yang dah diset 'test' di atas.
+                const response = await fetch(`${API_BASE_URL}/api/utility/bills?mosque=${MOSQUE_ID}`);
+                const bills = await response.json();
+
+                // Bills dari Supabase datang berasingan (satu baris = satu jenis bil).
+                // Kita kena gabungkan ikut bulan supaya padan dengan format graf asal.
+                const grouped = {};
+                
+                bills.forEach(b => {
+                    if (!grouped[b.bill_month]) {
+                        grouped[b.bill_month] = { month: b.bill_month, elecBill: 0, gasBill: 0, waterBill: 0, totalBill: 0 };
+                    }
+                    const amt = parseFloat(b.amount) || 0;
+                    if (b.bill_type === 'elektrik') grouped[b.bill_month].elecBill = amt;
+                    if (b.bill_type === 'gas') grouped[b.bill_month].gasBill = amt;
+                    if (b.bill_type === 'air') grouped[b.bill_month].waterBill = amt;
+                    
+                    grouped[b.bill_month].totalBill += amt; // Kira total
+                });
+
+                // Tukar object kepada array dan susun ikut bulan (Jan, Feb, ...)
+                // Nota: Kita guna tarikh palsu sikit untuk sorting sebab format string "Jan 2026"
+                currentData = Object.values(grouped).sort((a, b) => new Date(a.month) - new Date(b.month));
+
+            } catch (error) {
+                console.error("Failed to fetch bills:", error);
+                // Kalau fail, kita guna data kosong supaya tak crash
+                currentData = []; 
+            }
+        }
         let currentScale = 1;
 
         function toggleTheme() {
@@ -540,7 +567,11 @@
             URL.revokeObjectURL(url);
         }
 
-        window.onload = () => {
+                window.onload = async () => {
+            // 1. Tarik data dari Supabase dulu
+            await fetchBillData();
+            
+            // 2. Lepas data ada, baru lukis jadual dan graf
             renderData();
             renderChart();
         };
