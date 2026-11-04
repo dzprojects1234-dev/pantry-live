@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Household Utility Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+    <style>
+        /* [SAMA SEPERTI SEBELUM INI] */
+        :root {
+            --bg-color: #f8fafc;
+            --text-color: #1e293b;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --primary: #0f172a;
+            --accent: #10b981;
+            --elec-color: #f59e0b;
+            --gas-color: #ef4444;
+            --water-color: #3b82f6;
+            --font-scale: 1;
+        }
+
+        body.dark-mode {
+            --bg-color: #0f172a;
+            --text-color: #f8fafc;
+            --card-bg: #1e293b;
+            --border-color: #334155;
+            --primary: #f8fafc;
+            --accent: #34d399;
+            --elec-color: #fbbf24;
+            --gas-color: #f87171;
+            --water-color: #60a5fa;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background 0.3s, color 0.3s;
+            padding: 1rem;
+            font-size: calc(1rem * var(--font-scale));
+        }
+
+        .controls {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            max-width: 1000px;
+            margin: 0 auto 1rem auto;
+            flex-wrap: wrap;
+        }
+
+        button {
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            background: var(--card-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            transition: 0.2s;
+        }
+
+        button:hover { background: var(--border-color); }
+        button.primary { background: var(--accent); color: white; border: none; }
+        button.primary:hover { background: #059669; }
+        
+        .btn-print { background: #3b82f6; color: white; border: none; }
+        .btn-print:hover { background: #2563eb; }
+        .btn-share { background: #8b5cf6; color: white; border: none; }
+        .btn-share:hover { background: #7c3aed; }
+
+        .mobile-only { display: none; }
+
+        .container { max-width: 1000px; margin: 0 auto; }
+
+        .header { text-align: center; margin-bottom: 1.5rem; }
+        .header h1 { font-size: calc(1.8rem * var(--font-scale)); font-weight: 800; margin-bottom: 0.5rem; color: #3b82f6;}
+        body.dark-mode .header h1 { color: #60a5fa; }
+        .header p { font-size: calc(0.95rem * var(--font-scale)); opacity: 0.8; }
+        .demo-badge { display: inline-block; background: #fbbf24; color: #78350f; padding: 0.2rem 0.8rem; border-radius: 20px; font-weight: 700; font-size: 0.8rem; margin-bottom: 1rem; }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 1.2rem;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+
+        .card .icon { font-size: 1.8rem; margin-bottom: 0.3rem; }
+        .card h3 { font-size: calc(0.85rem * var(--font-scale)); opacity: 0.7; margin-bottom: 0.3rem; }
+        .card .value { font-size: calc(1.4rem * var(--font-scale)); font-weight: 800; }
+        
+        .card.total-card { background: #eff6ff; border-color: #bfdbfe; }
+        body.dark-mode .card.total-card { background: #1e3a8a; border-color: #1e40af; }
+        .card.total-card .value { color: #1d4ed8; }
+        body.dark-mode .card.total-card .value { color: #93c5fd; }
+
+        .chart-container {
+            background: var(--card-bg);
+            padding: 1rem;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            height: 400px;
+        }
+
+        .table-container {
+            background: var(--card-bg);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            overflow-x: auto;
+            margin-bottom: 2rem;
+        }
+
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th, td { padding: 0.8rem; border-bottom: 1px solid var(--border-color); font-size: calc(0.85rem * var(--font-scale)); }
+        th { background: rgba(0,0,0,0.02); font-weight: 700; }
+        .total-row td { font-weight: 800; background: rgba(239, 68, 68, 0.05); color: #ef4444; }
+        body.dark-mode .total-row td { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+
+        .pledge-section {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+        }
+        
+        .btn-pledge {
+            background: #22c55e;
+            color: white;
+            font-size: 1rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3);
+            border: none;
+        }
+        .btn-pledge:hover { background: #16a34a; }
+
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;
+            padding: 1rem;
+        }
+        .modal-content {
+            background: var(--card-bg); padding: 2rem; border-radius: 16px; width: 100%; max-width: 400px;
+        }
+        .modal-content h2 { margin-bottom: 1rem; font-size: 1.2rem; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.85rem; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 0.7rem; border-radius: 8px; border: 1px solid var(--border-color);
+            background: var(--bg-color); color: var(--text-color); font-family: inherit; font-size: 0.9rem;
+        }
+        .ref-box {
+            display: none; text-align: center; padding: 1.5rem; background: #d1fae5; color: #065f46;
+            border-radius: 8px; margin-top: 1rem;
+        }
+        .ref-box h3 { font-size: 1rem; margin-bottom: 0.5rem;}
+        .ref-box .code { font-size: 1.8rem; font-weight: 800; margin: 0.5rem 0; color: #047857;}
+        .ref-box p { font-size: 0.8rem; margin-bottom: 1rem;}
+
+        @media print {
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            body, .card, .chart-container, .table-container { background: white !important; color: black !important; }
+            .controls, .header p, .demo-badge, .no-print, .pledge-section, .modal { display: none !important; }
+            .card, .chart-container, .table-container { border: 1px solid #ccc !important; box-shadow: none !important; break-inside: avoid; }
+            th { background: #f1f5f9 !important; }
+            td, th { color: black !important; border-bottom: 1px solid #ccc !important; }
+            .chart-container { height: 300px !important; }
+        }
+
+        @media (max-width: 600px) {
+            .controls { justify-content: center; }
+            th, td { padding: 0.5rem; font-size: 0.75rem; }
+            .chart-container { height: 300px; padding: 0.5rem; }
+            .desktop-only { display: none; }
+            .mobile-only { display: inline-block; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <button onclick="toggleLang()" id="langBtn">BM</button>
+        <button onclick="toggleTheme()" id="themeBtn">🌙 Dark</button>
+        <button onclick="changeFontSize(0.1)">A+</button>
+        <button onclick="changeFontSize(-0.1)">A-</button>
+        <button onclick="window.print()" class="btn-print desktop-only">🖨️ Print PDF</button>
+        <button onclick="captureAndShare()" class="btn-share mobile-only">📤 Save Image</button>
+    </div>
+
+    <div class="container" id="capture-area">
+        <div class="header">
+            <div class="demo-badge no-print">PILOT PROJECT: Household Example</div>
+            <h1 id="titleText">My Home Utility Dashboard</h1>
+            <p id="subtitleText">Tracking my household's monthly bills.</p>
+        </div>
+
+        <div class="summary-grid">
+            <div class="card">
+                <div class="icon">⚡</div>
+                <h3 id="lblAvgElec">Average Electricity</h3>
+                <div class="value" id="avgElec">$0</div>
+            </div>
+            <div class="card">
+                <div class="icon">🔥</div>
+                <h3 id="lblAvgGas">Average Gas Bill</h3>
+                <div class="value" id="avgGas">$0</div>
+            </div>
+            <div class="card">
+                <div class="icon">💧</div>
+                <h3 id="lblAvgWater">Average Water Bill</h3>
+                <div class="value" id="avgWater">$0</div>
+            </div>
+            <div class="card total-card">
+                <div class="icon">💰</div>
+                <h3 id="lblAvgTotal">Average Total Final Bill</h3>
+                <div class="value" id="avgTotal">$0</div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="utilityChart"></canvas>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th id="thMonth">Month</th>
+                        <th id="thElecB">Electricity</th>
+                        <th id="thGasB">Gas</th>
+                        <th id="thWaterB">Water</th>
+                        <th id="thTotal">Total Final Bill</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+
+        <!-- BUTANG IKrar (TANPA SENARAI NAMA AWAM) -->
+        <div class="pledge-section no-print">
+            <button class="btn-pledge" onclick="openPledgeModal()" id="btnPledge">🤝 Make a Private Pledge</button>
+        </div>
+    </div>
+
+    <!-- MODAL PLEDGE -->
+    <div class="modal" id="pledgeModal">
+        <div class="modal-content">
+            <h2 id="modalTitle">Make a Pledge</h2>
+            <form id="pledgeForm" onsubmit="submitPledge(event)">
+                <div class="form-group">
+                    <label id="lblName">Name / Entity</label>
+                    <input type="text" id="pledgeName" required placeholder="e.g. Family of Haji Ahmad">
+                </div>
+                <div class="form-group">
+                    <label id="lblFor">In the Name of (Intention)</label>
+                    <select id="pledgeFor">
+                        <option value="Self">Self (Diri Sendiri)</option>
+                        <option value="Family">Family (Keluarga)</option>
+                        <option value="Deceased">Deceased Parents (Arwah Ibu Bapa)</option>
+                        <option value="Company">Company (Syarikat/Kedai)</option>
+                        <option value="Hamba Allah">Hamba Allah (Anonymous)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label id="lblAmount">Amount (SGD)</label>
+                    <input type="number" id="pledgeAmount" min="10" required placeholder="e.g. 50">
+                </div>
+                <button type="submit" class="btn-pledge" style="width: 100%; font-size: 1rem;" id="btnSubmit">Submit Pledge</button>
+            </form>
+            
+            <div class="ref-box" id="refBox">
+                <h3>Your Reference Number:</h3>
+                <div class="code" id="refNumberDisplay">IKRAR-0000</div>
+                <p>Please show this code at the mosque counter to make payment.</p>
+                <p style="font-size:0.75rem; color:#991b1b;"><em>*This code is not saved in any database. If you close this window, it will be lost.</em></p>
+                <button onclick="closePledgeModal()" style="margin-top: 0.5rem; background: #065f46; color: white; padding: 0.6rem 1.5rem; border:none; border-radius:8px; font-weight: 700;">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const defaultData = [
+            { month: "Aug 2025", elecBill: 42.00, gasBill: 3.50, waterBill: 25.00, totalBill: 75.00 },
+            { month: "Sep 2025", elecBill: 38.50, gasBill: 3.50, waterBill: 25.00, totalBill: 72.00 },
+            { month: "Oct 2025", elecBill: 34.00, gasBill: 1.50, waterBill: 15.00, totalBill: 55.00 },
+            { month: "Nov 2025", elecBill: 43.00, gasBill: 1.50, waterBill: 18.50, totalBill: 68.00 },
+            { month: "Dec 2025", elecBill: 33.50, gasBill: 2.20, waterBill: 19.80, totalBill: 60.50 },
+            { month: "Jan 2026", elecBill: 36.75, gasBill: 2.20, waterBill: 20.38, totalBill: 74.88 }
+        ];
+
+        let currentData = JSON.parse(localStorage.getItem('utilityData')) || defaultData;
+
+        let currentLang = 'en';
+        const langText = {
+            en: {
+                langBtn: "BM", themeBtn: "🌙 Dark", themeLight: "☀️ Light",
+                title: "My Home Utility Dashboard", subtitle: "Tracking my household's monthly bills.",
+                avgElec: "Average Electricity", avgGas: "Average Gas Bill", avgWater: "Average Water Bill", avgTotal: "Average Total Final Bill",
+                month: "Month", elecB: "Electricity", gasB: "Gas", waterB: "Water", total: "Total Final Bill",
+                btnPledge: "🤝 Make a Private Pledge", modalTitle: "Make a Pledge", lblName: "Name / Entity", lblFor: "In the Name of (Intention)", lblAmount: "Amount (SGD)", btnSubmit: "Submit Pledge"
+            },
+            ms: {
+                langBtn: "EN", themeBtn: "🌙 Gelap", themeLight: "☀️ Cerah",
+                title: "Papan Pemuka Utiliti Rumah", subtitle: "Memantau jumlah bil bulanan isi rumah saya.",
+                avgElec: "Purata Elektrik", avgGas: "Purata Bil Gas", avgWater: "Purata Bil Air", avgTotal: "Purata Jumlah Bil",
+                month: "Bulan", elecB: "Elektrik", gasB: "Gas", waterB: "Air", total: "Jumlah Bil",
+                btnPledge: "🤝 Buat Ikrar Sulit", modalTitle: "Buat Ikrar", lblName: "Nama / Syarikat", lblFor: "Atas Nama (Niat)", lblAmount: "Jumlah (SGD)", btnSubmit: "Hantar Ikrar"
+            }
+        };
+
+        function toggleLang() {
+            currentLang = currentLang === 'en' ? 'ms' : 'en';
+            const t = langText[currentLang];
+            
+            document.getElementById('langBtn').innerText = t.langBtn;
+            document.getElementById('titleText').innerText = t.title;
+            document.getElementById('subtitleText').innerText = t.subtitle;
+            document.getElementById('lblAvgElec').innerText = t.avgElec;
+            document.getElementById('lblAvgGas').innerText = t.avgGas;
+            document.getElementById('lblAvgWater').innerText = t.avgWater;
+            document.getElementById('lblAvgTotal').innerText = t.avgTotal;
+            
+            document.getElementById('thMonth').innerText = t.month;
+            document.getElementById('thElecB').innerText = t.elecB;
+            document.getElementById('thGasB').innerText = t.gasB;
+            document.getElementById('thWaterB').innerText = t.waterB;
+            document.getElementById('thTotal').innerText = t.total;
+
+            document.getElementById('btnPledge').innerText = t.btnPledge;
+            document.getElementById('modalTitle').innerText = t.modalTitle;
+            document.getElementById('lblName').innerText = t.lblName;
+            document.getElementById('lblFor').innerText = t.lblFor;
+            document.getElementById('lblAmount').innerText = t.lblAmount;
+            document.getElementById('btnSubmit').innerText = t.btnSubmit;
+
+            renderTable();
+            renderChart();
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            document.getElementById('themeBtn').innerText = isDark ? langText[currentLang].themeLight : langText[currentLang].themeBtn;
+            updateChartColors(isDark);
+        }
+
+        let currentScale = 1;
+        function changeFontSize(amount) {
+            currentScale += amount;
+            if (currentScale < 0.8) currentScale = 0.8;
+            if (currentScale > 1.5) currentScale = 1.5;
+            document.documentElement.style.setProperty('--font-scale', currentScale);
+        }
+
+        function formatSGD(amount) { return "$" + amount.toLocaleString('en-SG', {minimumFractionDigits: 2, maximumFractionDigits: 2}); }
+
+        function renderData() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            
+            let totalElec = 0, totalGas = 0, totalWater = 0, totalFinal = 0;
+
+            currentData.forEach(data => {
+                totalElec += data.elecBill;
+                totalGas += data.gasBill;
+                totalWater += data.waterBill;
+                totalFinal += data.totalBill;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${data.month}</strong></td>
+                    <td>${formatSGD(data.elecBill)}</td>
+                    <td>${formatSGD(data.gasBill)}</td>
+                    <td>${formatSGD(data.waterBill)}</td>
+                    <td><strong>${formatSGD(data.totalBill)}</strong></td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            const count = currentData.length;
+            if(count > 0) {
+                const trTotal = document.createElement('tr');
+                trTotal.className = 'total-row';
+                trTotal.innerHTML = `
+                    <td>TOTAL (${count} Mths)</td>
+                    <td>${formatSGD(totalElec)}</td>
+                    <td>${formatSGD(totalGas)}</td>
+                    <td>${formatSGD(totalWater)}</td>
+                    <td>${formatSGD(totalFinal)}</td>
+                `;
+                tbody.appendChild(trTotal);
+
+                document.getElementById('avgElec').innerText = formatSGD(totalElec / count);
+                document.getElementById('avgGas').innerText = formatSGD(totalGas / count);
+                document.getElementById('avgWater').innerText = formatSGD(totalWater / count);
+                document.getElementById('avgTotal').innerText = formatSGD(totalFinal / count);
+            }
+        }
+
+        function renderTable() { renderData(); }
+
+        function openPledgeModal() {
+            document.getElementById('pledgeModal').style.display = 'flex';
+            document.getElementById('pledgeForm').style.display = 'block';
+            document.getElementById('refBox').style.display = 'none';
+            document.getElementById('pledgeForm').reset();
+        }
+
+        function closePledgeModal() {
+            document.getElementById('pledgeModal').style.display = 'none';
+        }
+
+        function submitPledge(e) {
+            e.preventDefault();
+            // HANYA JANA KOD, TIDAK SIMPAN DATA DI MANA-MANA
+            const refNum = 'IKRAR-' + Math.floor(1000 + Math.random() * 9000);
+            
+            document.getElementById('pledgeForm').style.display = 'none';
+            document.getElementById('refBox').style.display = 'block';
+            document.getElementById('refNumberDisplay').innerText = refNum;
+        }
+
+        let myChart = null;
+        function renderChart() {
+            const ctx = document.getElementById('utilityChart').getContext('2d');
+            const labels = currentData.map(d => d.month);
+            const elecData = currentData.map(d => d.elecBill);
+            const gasData = currentData.map(d => d.gasBill);
+            const waterData = currentData.map(d => d.waterBill);
+            const totalData = currentData.map(d => d.totalBill);
+            
+            const isDark = document.body.classList.contains('dark-mode');
+            const gridColor = isDark ? '#334155' : '#e2e8f0';
+            const textColor = isDark ? '#cbd5e1' : '#64748b';
+
+            const isMobile = window.innerWidth < 600;
+            const lineThickness = isMobile ? 2 : 4;
+            const pointSize = isMobile ? 2 : 4;
+
+            if (myChart) myChart.destroy();
+
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Total Final Bill ($)', data: totalData, borderColor: '#8b5cf6', backgroundColor: '#8b5cf6', borderWidth: lineThickness + 1, tension: 0.3, pointRadius: pointSize },
+                        { label: 'Electricity ($)', data: elecData, borderColor: '#f59e0b', backgroundColor: '#f59e0b', borderWidth: lineThickness, tension: 0.3, pointRadius: pointSize },
+                        { label: 'Water ($)', data: waterData, borderColor: '#3b82f6', backgroundColor: '#3b82f6', borderWidth: lineThickness, tension: 0.3, pointRadius: pointSize },
+                        { label: 'Gas ($)', data: gasData, borderColor: '#ef4444', backgroundColor: '#ef4444', borderWidth: lineThickness, tension: 0.3, pointRadius: pointSize }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'nearest', intersect: true },
+                    plugins: {
+                        legend: { labels: { color: textColor, boxWidth: isMobile ? 12 : 40 } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) { label += ': '; }
+                                    if (context.parsed.y !== null) { label += '$' + context.parsed.y.toFixed(2); }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { ticks: { color: textColor, maxRotation: 45, minRotation: 45, font: { size: isMobile ? 10 : 12 } }, grid: { display: false } },
+                        y: { ticks: { color: textColor, font: { size: isMobile ? 10 : 12 } }, grid: { color: gridColor } }
+                    }
+                }
+            });
+        }
+
+        window.addEventListener('resize', () => {
+            if(myChart) renderChart();
+        });
+
+        function updateChartColors(isDark) {
+            if(myChart) {
+                myChart.options.plugins.legend.labels.color = isDark ? '#f8fafc' : '#1e293b';
+                myChart.options.scales.x.ticks.color = isDark ? '#cbd5e1' : '#64748b';
+                myChart.options.scales.y.ticks.color = isDark ? '#cbd5e1' : '#64748b';
+                myChart.options.scales.y.grid.color = isDark ? '#334155' : '#e2e8f0';
+                myChart.update();
+            }
+        }
+
+        function captureAndShare() {
+            const btn = document.querySelector('.btn-share');
+            const originalText = btn.innerText;
+            btn.innerText = "⏳ Processing...";
+            btn.disabled = true;
+
+            const element = document.getElementById('capture-area');
+            const isDark = document.body.classList.contains('dark-mode');
+            if(isDark) { document.body.classList.remove('dark-mode'); }
+
+            html2canvas(element, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: "#ffffff",
+                ignoreElements: function(element) {
+                    return element.classList.contains('no-print');
+                }
+            }).then(canvas => {
+                if(isDark) { document.body.classList.add('dark-mode'); }
+
+                canvas.toBlob(function(blob) {
+                    const file = new File([blob], "utility_dashboard.png", { type: "image/png" });
+                    
+                    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                        navigator.share({
+                            files: [file],
+                            title: 'Utility Dashboard',
+                            text: 'Here is the utility dashboard.'
+                        }).then(() => {
+                            btn.innerText = originalText;
+                            btn.disabled = false;
+                        }).catch(error => {
+                            downloadImage(blob);
+                            btn.innerText = originalText;
+                            btn.disabled = false;
+                        });
+                    } else {
+                        downloadImage(blob);
+                        btn.innerText = originalText;
+                        btn.disabled = false;
+                    }
+                }, "image/png");
+            }).catch(err => {
+                alert("Maaf, sistem telefon anda tidak menyokong fungsi ini.");
+                if(isDark) { document.body.classList.add('dark-mode'); }
+                btn.innerText = originalText;
+                btn.disabled = false;
+            });
+        }
+
+        function downloadImage(blob) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "utility_dashboard.png";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        window.onload = () => {
+            if(!localStorage.getItem('utilityData')) {
+                localStorage.setItem('utilityData', JSON.stringify(defaultData));
+            }
+            currentData = JSON.parse(localStorage.getItem('utilityData'));
+            renderData();
+            renderChart();
+        };
+    </script>
+</body>
+</html>
