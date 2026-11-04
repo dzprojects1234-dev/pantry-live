@@ -28,6 +28,13 @@
         .action-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
         .btn-refresh { background: #64748b; color: white; padding: 0.5rem 1rem; border-radius: 8px; border: none; cursor: pointer; }
         .btn-logout { background: #ef4444; color: white; padding: 0.5rem 1rem; border-radius: 8px; border: none; cursor: pointer; }
+
+        /* Form Bill Styles */
+        .bill-form { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; background: #1e293b; padding: 1rem; border-radius: 8px; border: 1px solid #334155; }
+        .bill-form input, .bill-form select { padding: 0.6rem; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white; width: 100%; font-family: inherit;}
+        .bill-form button { background: #8b5cf6; color: white; border: none; padding: 0.6rem; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%;}
+        .bill-form button:hover { background: #7c3aed; }
+        .form-row-full { grid-column: 1 / -1; }
     </style>
 </head>
 <body>
@@ -47,6 +54,23 @@
 
         <!-- DASHBOARD SECTION (Hidden initially) -->
         <div id="dashboardSection" class="hidden">
+            
+            <!-- BAHAGIAN 1: UPDATE BILL -->
+            <h3>📝 Update Utility Bill</h3>
+            <div class="bill-form">
+                <select id="billType">
+                    <option value="elektrik">⚡ Electricity</option>
+                    <option value="air">💧 Water</option>
+                    <option value="gas">🔥 Gas</option>
+                </select>
+                <input type="text" id="billMonth" placeholder="Month (e.g. Nov 2026)" required>
+                <input type="number" id="billAmount" step="0.01" placeholder="Amount ($)" required>
+                <button class="form-row-full" onclick="saveBill()" id="btnSaveBill">Save Bill</button>
+            </div>
+
+            <hr style="border-color: #334155; margin: 2rem 0;">
+
+            <!-- BAHAGIAN 2: SENARAI IKAR -->
             <div class="action-bar">
                 <h3 style="margin: 0; border: none;">Pledge List</h3>
                 <div>
@@ -74,16 +98,13 @@
 
     <script>
         // --- KONFIGURASI ---
-        // Pastikan URL ini sama dengan URL Cloudflare Worker Pantry Pak Cik
         const API_BASE_URL = 'https://frosty-frog-9bafpantry.dz-projects1234.workers.dev';
-        const MOSQUE_ID = 'test'; // Guna 'test' untuk ujian. Tukar ke 'al-khair' atau 'al-iman' nanti.
+        const MOSQUE_ID = 'test';
 
         // --- AUTH LOGIC ---
         let authToken = localStorage.getItem('utilityAdminToken') || null;
 
         function login() {
-            // Di sini kita guna sistem login Pantry Pak Cik yang sedia ada
-            // (Kita hantar request ke endpoint /api/pantry/auth/login)
             const password = document.getElementById('adminPassword').value;
             
             fetch(`${API_BASE_URL}/api/pantry/auth/login`, {
@@ -118,7 +139,49 @@
             fetchPledges();
         }
 
-        // --- DATA LOGIC ---
+        // --- LOGIK SIMPAN BIL ---
+        function saveBill() {
+            const bill_type = document.getElementById('billType').value;
+            const bill_month = document.getElementById('billMonth').value;
+            const amount = parseFloat(document.getElementById('billAmount').value);
+            const btn = document.getElementById('btnSaveBill');
+
+            if (!bill_month || isNaN(amount)) {
+                alert("Please enter a valid month and amount.");
+                return;
+            }
+
+            btn.innerText = "Saving...";
+            btn.disabled = true;
+
+            fetch(`${API_BASE_URL}/api/utility/bills?mosque=${MOSQUE_ID}`, {
+                method: 'POST',
+                headers: { 
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ bill_type, bill_month, amount })
+            })
+            .then(res => {
+                if(!res.ok) throw new Error("Unauthorized or server error");
+                return res.json();
+            })
+            .then(data => {
+                alert(`✅ Bill for ${bill_month} (${bill_type}) saved successfully!`);
+                document.getElementById('billAmount').value = ''; // Reset amount
+                document.getElementById('billMonth').value = ''; // Reset month
+            })
+            .catch(err => {
+                alert("❌ Failed to save bill. Your session may have expired.");
+                console.error(err);
+            })
+            .finally(() => {
+                btn.innerText = "Save Bill";
+                btn.disabled = false;
+            });
+        }
+
+        // --- LOGIK IKAR (PLEDGES) ---
         function fetchPledges() {
             const tbody = document.getElementById('pledgeListBody');
             tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Fetching data...</td></tr>';
@@ -174,7 +237,7 @@
             .then(res => res.json())
             .then(data => {
                 if(data.success) {
-                    fetchPledges(); // Refresh list
+                    fetchPledges(); 
                 } else {
                     alert("Failed to update.");
                 }
