@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Household Utility Dashboard</title>
+    <title>Utility Transparency & Pledge</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
     <style>
-        /* [SAMA SEPERTI SEBELUM INI] */
         :root {
             --bg-color: #f8fafc;
             --text-color: #1e293b;
@@ -85,7 +84,6 @@
         .header h1 { font-size: calc(1.8rem * var(--font-scale)); font-weight: 800; margin-bottom: 0.5rem; color: #3b82f6;}
         body.dark-mode .header h1 { color: #60a5fa; }
         .header p { font-size: calc(0.95rem * var(--font-scale)); opacity: 0.8; }
-        .demo-badge { display: inline-block; background: #fbbf24; color: #78350f; padding: 0.2rem 0.8rem; border-radius: 20px; font-weight: 700; font-size: 0.8rem; margin-bottom: 1rem; }
 
         .summary-grid {
             display: grid;
@@ -139,8 +137,14 @@
         .pledge-section {
             text-align: center;
             margin-bottom: 2rem;
-            padding: 1rem;
+            padding: 2rem;
+            background: #f0fdf4;
+            border-radius: 16px;
+            border: 2px dashed #22c55e;
         }
+        body.dark-mode .pledge-section { background: #064e3b; border-color: #10b981; }
+        .pledge-section h2 { color: #166534; margin-bottom: 0.5rem; }
+        body.dark-mode .pledge-section h2 { color: #6ee7b7; }
         
         .btn-pledge {
             background: #22c55e;
@@ -150,9 +154,11 @@
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3);
             border: none;
+            margin-top: 1rem;
         }
         .btn-pledge:hover { background: #16a34a; }
 
+        /* Modal */
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;
@@ -168,18 +174,16 @@
             width: 100%; padding: 0.7rem; border-radius: 8px; border: 1px solid var(--border-color);
             background: var(--bg-color); color: var(--text-color); font-family: inherit; font-size: 0.9rem;
         }
-        .ref-box {
+        
+        .success-box {
             display: none; text-align: center; padding: 1.5rem; background: #d1fae5; color: #065f46;
             border-radius: 8px; margin-top: 1rem;
         }
-        .ref-box h3 { font-size: 1rem; margin-bottom: 0.5rem;}
-        .ref-box .code { font-size: 1.8rem; font-weight: 800; margin: 0.5rem 0; color: #047857;}
-        .ref-box p { font-size: 0.8rem; margin-bottom: 1rem;}
 
         @media print {
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             body, .card, .chart-container, .table-container { background: white !important; color: black !important; }
-            .controls, .header p, .demo-badge, .no-print, .pledge-section, .modal { display: none !important; }
+            .controls, .header p, .no-print, .pledge-section, .modal { display: none !important; }
             .card, .chart-container, .table-container { border: 1px solid #ccc !important; box-shadow: none !important; break-inside: avoid; }
             th { background: #f1f5f9 !important; }
             td, th { color: black !important; border-bottom: 1px solid #ccc !important; }
@@ -198,7 +202,6 @@
 <body>
 
     <div class="controls">
-        <button onclick="toggleLang()" id="langBtn">BM</button>
         <button onclick="toggleTheme()" id="themeBtn">🌙 Dark</button>
         <button onclick="changeFontSize(0.1)">A+</button>
         <button onclick="changeFontSize(-0.1)">A-</button>
@@ -208,30 +211,29 @@
 
     <div class="container" id="capture-area">
         <div class="header">
-            <div class="demo-badge no-print">PILOT PROJECT: Household Example</div>
-            <h1 id="titleText">My Home Utility Dashboard</h1>
-            <p id="subtitleText">Tracking my household's monthly bills.</p>
+            <h1>My Home Utility Dashboard</h1>
+            <p>Tracking my household's monthly bills.</p>
         </div>
 
         <div class="summary-grid">
             <div class="card">
                 <div class="icon">⚡</div>
-                <h3 id="lblAvgElec">Average Electricity</h3>
+                <h3>Average Electricity</h3>
                 <div class="value" id="avgElec">$0</div>
             </div>
             <div class="card">
                 <div class="icon">🔥</div>
-                <h3 id="lblAvgGas">Average Gas Bill</h3>
+                <h3>Average Gas Bill</h3>
                 <div class="value" id="avgGas">$0</div>
             </div>
             <div class="card">
                 <div class="icon">💧</div>
-                <h3 id="lblAvgWater">Average Water Bill</h3>
+                <h3>Average Water Bill</h3>
                 <div class="value" id="avgWater">$0</div>
             </div>
             <div class="card total-card">
                 <div class="icon">💰</div>
-                <h3 id="lblAvgTotal">Average Total Final Bill</h3>
+                <h3>Average Total Final Bill</h3>
                 <div class="value" id="avgTotal">$0</div>
             </div>
         </div>
@@ -244,34 +246,36 @@
             <table>
                 <thead>
                     <tr>
-                        <th id="thMonth">Month</th>
-                        <th id="thElecB">Electricity</th>
-                        <th id="thGasB">Gas</th>
-                        <th id="thWaterB">Water</th>
-                        <th id="thTotal">Total Final Bill</th>
+                        <th>Month</th>
+                        <th>Electricity</th>
+                        <th>Gas</th>
+                        <th>Water</th>
+                        <th>Total Final Bill</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
             </table>
         </div>
 
-        <!-- BUTANG IKrar (TANPA SENARAI NAMA AWAM) -->
+        <!-- PLEDGE SECTION -->
         <div class="pledge-section no-print">
-            <button class="btn-pledge" onclick="openPledgeModal()" id="btnPledge">🤝 Make a Private Pledge</button>
+            <h2>Support Our Utility Bills</h2>
+            <p>Make a pledge in the name of your family, loved ones, or business. Pay at the mosque counter.</p>
+            <button class="btn-pledge" onclick="openPledgeModal()">🤝 Make a Pledge</button>
         </div>
     </div>
 
     <!-- MODAL PLEDGE -->
     <div class="modal" id="pledgeModal">
         <div class="modal-content">
-            <h2 id="modalTitle">Make a Pledge</h2>
+            <h2>Make a Pledge</h2>
             <form id="pledgeForm" onsubmit="submitPledge(event)">
                 <div class="form-group">
-                    <label id="lblName">Name / Entity</label>
+                    <label>Name / Entity</label>
                     <input type="text" id="pledgeName" required placeholder="e.g. Family of Haji Ahmad">
                 </div>
                 <div class="form-group">
-                    <label id="lblFor">In the Name of (Intention)</label>
+                    <label>In the Name of (Intention)</label>
                     <select id="pledgeFor">
                         <option value="Self">Self (Diri Sendiri)</option>
                         <option value="Family">Family (Keluarga)</option>
@@ -281,23 +285,27 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label id="lblAmount">Amount (SGD)</label>
+                    <label>Amount (SGD)</label>
                     <input type="number" id="pledgeAmount" min="10" required placeholder="e.g. 50">
                 </div>
-                <button type="submit" class="btn-pledge" style="width: 100%; font-size: 1rem;" id="btnSubmit">Submit Pledge</button>
+                <button type="submit" class="btn-pledge" style="width: 100%;" id="btnSubmit">Submit Pledge</button>
             </form>
             
-            <div class="ref-box" id="refBox">
-                <h3>Your Reference Number:</h3>
-                <div class="code" id="refNumberDisplay">IKRAR-0000</div>
-                <p>Please show this code at the mosque counter to make payment.</p>
-                <p style="font-size:0.75rem; color:#991b1b;"><em>*This code is not saved in any database. If you close this window, it will be lost.</em></p>
-                <button onclick="closePledgeModal()" style="margin-top: 0.5rem; background: #065f46; color: white; padding: 0.6rem 1.5rem; border:none; border-radius:8px; font-weight: 700;">Close</button>
+            <div class="success-box" id="successBox">
+                <h3 style="margin-bottom: 0.5rem; color: #065f46;">✅ Pledge Recorded!</h3>
+                <p style="font-size: 0.9rem; margin-bottom: 1rem;">Please proceed to the mosque counter to make your payment.</p>
+                <button onclick="closePledgeModal()" style="background: #059669; color: white; padding: 0.6rem 1.5rem; border:none; border-radius:8px; font-weight: 700;">Close</button>
             </div>
         </div>
     </div>
 
     <script>
+        // --- KONFIGURASI ---
+        // Pastikan URL ini sama dengan URL Cloudflare Worker Pantry Pak Cik
+        const API_BASE_URL = 'https://frosty-frog-9bafpantry.dz-projects1234.workers.dev';
+        const MOSQUE_ID = 'test'; 
+
+        // --- DATA FOR CHART & TABLE (Static for demo) ---
         const defaultData = [
             { month: "Aug 2025", elecBill: 42.00, gasBill: 3.50, waterBill: 25.00, totalBill: 75.00 },
             { month: "Sep 2025", elecBill: 38.50, gasBill: 3.50, waterBill: 25.00, totalBill: 72.00 },
@@ -307,63 +315,16 @@
             { month: "Jan 2026", elecBill: 36.75, gasBill: 2.20, waterBill: 20.38, totalBill: 74.88 }
         ];
 
-        let currentData = JSON.parse(localStorage.getItem('utilityData')) || defaultData;
-
-        let currentLang = 'en';
-        const langText = {
-            en: {
-                langBtn: "BM", themeBtn: "🌙 Dark", themeLight: "☀️ Light",
-                title: "My Home Utility Dashboard", subtitle: "Tracking my household's monthly bills.",
-                avgElec: "Average Electricity", avgGas: "Average Gas Bill", avgWater: "Average Water Bill", avgTotal: "Average Total Final Bill",
-                month: "Month", elecB: "Electricity", gasB: "Gas", waterB: "Water", total: "Total Final Bill",
-                btnPledge: "🤝 Make a Private Pledge", modalTitle: "Make a Pledge", lblName: "Name / Entity", lblFor: "In the Name of (Intention)", lblAmount: "Amount (SGD)", btnSubmit: "Submit Pledge"
-            },
-            ms: {
-                langBtn: "EN", themeBtn: "🌙 Gelap", themeLight: "☀️ Cerah",
-                title: "Papan Pemuka Utiliti Rumah", subtitle: "Memantau jumlah bil bulanan isi rumah saya.",
-                avgElec: "Purata Elektrik", avgGas: "Purata Bil Gas", avgWater: "Purata Bil Air", avgTotal: "Purata Jumlah Bil",
-                month: "Bulan", elecB: "Elektrik", gasB: "Gas", waterB: "Air", total: "Jumlah Bil",
-                btnPledge: "🤝 Buat Ikrar Sulit", modalTitle: "Buat Ikrar", lblName: "Nama / Syarikat", lblFor: "Atas Nama (Niat)", lblAmount: "Jumlah (SGD)", btnSubmit: "Hantar Ikrar"
-            }
-        };
-
-        function toggleLang() {
-            currentLang = currentLang === 'en' ? 'ms' : 'en';
-            const t = langText[currentLang];
-            
-            document.getElementById('langBtn').innerText = t.langBtn;
-            document.getElementById('titleText').innerText = t.title;
-            document.getElementById('subtitleText').innerText = t.subtitle;
-            document.getElementById('lblAvgElec').innerText = t.avgElec;
-            document.getElementById('lblAvgGas').innerText = t.avgGas;
-            document.getElementById('lblAvgWater').innerText = t.avgWater;
-            document.getElementById('lblAvgTotal').innerText = t.avgTotal;
-            
-            document.getElementById('thMonth').innerText = t.month;
-            document.getElementById('thElecB').innerText = t.elecB;
-            document.getElementById('thGasB').innerText = t.gasB;
-            document.getElementById('thWaterB').innerText = t.waterB;
-            document.getElementById('thTotal').innerText = t.total;
-
-            document.getElementById('btnPledge').innerText = t.btnPledge;
-            document.getElementById('modalTitle').innerText = t.modalTitle;
-            document.getElementById('lblName').innerText = t.lblName;
-            document.getElementById('lblFor').innerText = t.lblFor;
-            document.getElementById('lblAmount').innerText = t.lblAmount;
-            document.getElementById('btnSubmit').innerText = t.btnSubmit;
-
-            renderTable();
-            renderChart();
-        }
+        let currentData = defaultData;
+        let currentScale = 1;
 
         function toggleTheme() {
             document.body.classList.toggle('dark-mode');
             const isDark = document.body.classList.contains('dark-mode');
-            document.getElementById('themeBtn').innerText = isDark ? langText[currentLang].themeLight : langText[currentLang].themeBtn;
+            document.getElementById('themeBtn').innerText = isDark ? "☀️ Light" : "🌙 Dark";
             updateChartColors(isDark);
         }
 
-        let currentScale = 1;
         function changeFontSize(amount) {
             currentScale += amount;
             if (currentScale < 0.8) currentScale = 0.8;
@@ -416,12 +377,11 @@
             }
         }
 
-        function renderTable() { renderData(); }
-
+        // --- PLEDGE LOGIC (SEND TO CLOUDFLARE) ---
         function openPledgeModal() {
             document.getElementById('pledgeModal').style.display = 'flex';
             document.getElementById('pledgeForm').style.display = 'block';
-            document.getElementById('refBox').style.display = 'none';
+            document.getElementById('successBox').style.display = 'none';
             document.getElementById('pledgeForm').reset();
         }
 
@@ -429,16 +389,41 @@
             document.getElementById('pledgeModal').style.display = 'none';
         }
 
-        function submitPledge(e) {
+        async function submitPledge(e) {
             e.preventDefault();
-            // HANYA JANA KOD, TIDAK SIMPAN DATA DI MANA-MANA
-            const refNum = 'IKRAR-' + Math.floor(1000 + Math.random() * 9000);
+            const name = document.getElementById('pledgeName').value;
+            const intent = document.getElementById('pledgeFor').value;
+            const amount = document.getElementById('pledgeAmount').value;
+            const btnSubmit = document.getElementById('btnSubmit');
             
-            document.getElementById('pledgeForm').style.display = 'none';
-            document.getElementById('refBox').style.display = 'block';
-            document.getElementById('refNumberDisplay').innerText = refNum;
+            btnSubmit.innerText = "⏳ Sending...";
+            btnSubmit.disabled = true;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/utility/pledge?mosque=${MOSQUE_ID}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, intent, amount })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    document.getElementById('pledgeForm').style.display = 'none';
+                    document.getElementById('successBox').style.display = 'block';
+                } else {
+                    alert("Failed: " + result.error);
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Network error. Please try again.");
+            } finally {
+                btnSubmit.innerText = "Submit Pledge";
+                btnSubmit.disabled = false;
+            }
         }
 
+        // --- CHART LOGIC ---
         let myChart = null;
         function renderChart() {
             const ctx = document.getElementById('utilityChart').getContext('2d');
@@ -494,10 +479,6 @@
             });
         }
 
-        window.addEventListener('resize', () => {
-            if(myChart) renderChart();
-        });
-
         function updateChartColors(isDark) {
             if(myChart) {
                 myChart.options.plugins.legend.labels.color = isDark ? '#f8fafc' : '#1e293b';
@@ -530,20 +511,10 @@
 
                 canvas.toBlob(function(blob) {
                     const file = new File([blob], "utility_dashboard.png", { type: "image/png" });
-                    
                     if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-                        navigator.share({
-                            files: [file],
-                            title: 'Utility Dashboard',
-                            text: 'Here is the utility dashboard.'
-                        }).then(() => {
-                            btn.innerText = originalText;
-                            btn.disabled = false;
-                        }).catch(error => {
-                            downloadImage(blob);
-                            btn.innerText = originalText;
-                            btn.disabled = false;
-                        });
+                        navigator.share({ files: [file], title: 'Utility Dashboard', text: 'Here is the utility dashboard.' })
+                        .then(() => { btn.innerText = originalText; btn.disabled = false; })
+                        .catch(() => { downloadImage(blob); btn.innerText = originalText; btn.disabled = false; });
                     } else {
                         downloadImage(blob);
                         btn.innerText = originalText;
@@ -551,7 +522,7 @@
                     }
                 }, "image/png");
             }).catch(err => {
-                alert("Maaf, sistem telefon anda tidak menyokong fungsi ini.");
+                alert("Failed to capture image.");
                 if(isDark) { document.body.classList.add('dark-mode'); }
                 btn.innerText = originalText;
                 btn.disabled = false;
@@ -570,10 +541,6 @@
         }
 
         window.onload = () => {
-            if(!localStorage.getItem('utilityData')) {
-                localStorage.setItem('utilityData', JSON.stringify(defaultData));
-            }
-            currentData = JSON.parse(localStorage.getItem('utilityData'));
             renderData();
             renderChart();
         };
