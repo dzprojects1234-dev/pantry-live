@@ -301,26 +301,22 @@
 
     <script>
         // --- KONFIGURASI ---
-        // Pastikan URL ini sama dengan URL Cloudflare Worker Pantry Pak Cik
         const API_BASE_URL = 'https://frosty-frog-9bafpantry.dz-projects1234.workers.dev';
         const MOSQUE_ID = 'test'; 
 
-        // --- DATA FOR CHART & TABLE (Static for demo) ---
-                // --- DATA FOR CHART & TABLE (Dynamic from API) ---
+        // --- STATE ---
         let currentData = [];
         let currentScale = 1;
+        let myChart = null;
 
-        // Fungsi baru untuk tarik data dari Cloudflare Worker
+        // --- FETCH DATA DARI SUPABASE ---
         async function fetchBillData() {
             try {
-                // Tarik dari API. Guna MOSQUE_ID yang dah diset 'test' di atas.
                 const response = await fetch(`${API_BASE_URL}/api/utility/bills?mosque=${MOSQUE_ID}`);
                 const bills = await response.json();
 
-                // Bills dari Supabase datang berasingan (satu baris = satu jenis bil).
-                // Kita kena gabungkan ikut bulan supaya padan dengan format graf asal.
+                // Kumpul ikut bulan
                 const grouped = {};
-                
                 bills.forEach(b => {
                     if (!grouped[b.bill_month]) {
                         grouped[b.bill_month] = { month: b.bill_month, elecBill: 0, gasBill: 0, waterBill: 0, totalBill: 0 };
@@ -329,22 +325,19 @@
                     if (b.bill_type === 'elektrik') grouped[b.bill_month].elecBill = amt;
                     if (b.bill_type === 'gas') grouped[b.bill_month].gasBill = amt;
                     if (b.bill_type === 'air') grouped[b.bill_month].waterBill = amt;
-                    
-                    grouped[b.bill_month].totalBill += amt; // Kira total
+                    grouped[b.bill_month].totalBill += amt;
                 });
 
-                // Tukar object kepada array dan susun ikut bulan (Jan, Feb, ...)
-                // Nota: Kita guna tarikh palsu sikit untuk sorting sebab format string "Jan 2026"
+                // Susun ikut tarikh (Jan, Feb, ...)
                 currentData = Object.values(grouped).sort((a, b) => new Date(a.month) - new Date(b.month));
 
             } catch (error) {
                 console.error("Failed to fetch bills:", error);
-                // Kalau fail, kita guna data kosong supaya tak crash
                 currentData = []; 
             }
         }
-        let currentScale = 1;
 
+        // --- KAWALAN UI ---
         function toggleTheme() {
             document.body.classList.toggle('dark-mode');
             const isDark = document.body.classList.contains('dark-mode');
@@ -361,6 +354,7 @@
 
         function formatSGD(amount) { return "$" + amount.toLocaleString('en-SG', {minimumFractionDigits: 2, maximumFractionDigits: 2}); }
 
+        // --- RENDER JADUAL & KIRAAN ---
         function renderData() {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
@@ -404,7 +398,7 @@
             }
         }
 
-        // --- PLEDGE LOGIC (SEND TO CLOUDFLARE) ---
+        // --- LOGIK IKAR (PLEDGE) ---
         function openPledgeModal() {
             document.getElementById('pledgeModal').style.display = 'flex';
             document.getElementById('pledgeForm').style.display = 'block';
@@ -450,8 +444,7 @@
             }
         }
 
-        // --- CHART LOGIC ---
-        let myChart = null;
+        // --- LOGIK GRAF ---
         function renderChart() {
             const ctx = document.getElementById('utilityChart').getContext('2d');
             const labels = currentData.map(d => d.month);
@@ -516,6 +509,7 @@
             }
         }
 
+        // --- SIMPAN IMEJ ---
         function captureAndShare() {
             const btn = document.querySelector('.btn-share');
             const originalText = btn.innerText;
@@ -567,7 +561,8 @@
             URL.revokeObjectURL(url);
         }
 
-                window.onload = async () => {
+        // --- INITIALIZATION ---
+        window.onload = async () => {
             // 1. Tarik data dari Supabase dulu
             await fetchBillData();
             
