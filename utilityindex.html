@@ -110,6 +110,11 @@
         .card.total-card .value { color: #1d4ed8; }
         body.dark-mode .card.total-card .value { color: #93c5fd; }
 
+        .card.pledge-card { background: #f0fdf4; border-color: #bbf7d0; }
+        body.dark-mode .card.pledge-card { background: #064e3b; border-color: #10b981; }
+        .card.pledge-card .value { color: #166534; }
+        body.dark-mode .card.pledge-card .value { color: #6ee7b7; }
+
         .chart-container {
             background: var(--card-bg);
             padding: 1rem;
@@ -236,10 +241,10 @@
                 <h3>Average Total Final Bill</h3>
                 <div class="value" id="avgTotal">$0</div>
             </div>
-                <div class="card" style="background: #f0fdf4; border-color: #bbf7d0;">
+            <div class="card pledge-card">
                 <div class="icon">🤝</div>
                 <h3>Total Pledged (Paid)</h3>
-                <div class="value" id="totalPledged" style="color: #166534;">$0</div>
+                <div class="value" id="totalPledged">$0</div>
             </div>
         </div>
 
