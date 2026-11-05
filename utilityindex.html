@@ -345,39 +345,18 @@
         // --- FETCH DATA IKAR (PLEDGES) ---
         async function fetchPledgedData() {
             try {
-                // Kita guna endpoint yang sama macam admin, tapi kita tak perlukan token sebab ni cuma baca.
-                // Tapi memandangkan endpoint tu perlukan token, kita buat cara mudah: 
-                // kita guna API public (kalau ada) atau panggil terus Supabase kalau API benarkan.
-                // Memandangkan worker kita perlukan token untuk /pledges, kita kena guna endpoint public yg tersedia.
-                // TETAPI, memandangkan kita taknak ubah worker, kita just skip fetch kalau fail, atau minta admin buat public.
-                // Cara paling mudah: Kita guna data dummy kalau API tak bagi. Tapi mari kita cuba fetch public bills je dulu.
-                
-                // *Nota: Memandangkan Worker kita tak bagi public read untuk pledges, 
-                // kita akan tunjuk $0 dulu jika tiada. (Kita akan baiki ini di Fasa 5 nanti).*
-                
-                // UPDATE: Kita guna Supabase API terus (kalau RLS benarkan public read, kalau tak, dia return empty).
-                // Pak Cik, untuk pastikan ini berjaya, kita kena pastikan RLS 'utility_pledges' benarkan SELECT untuk public.
-                
-                const res = await fetch(`${API_BASE_URL}/api/utility/pledges?mosque=${MOSQUE_ID}`, {
-                    method: 'GET',
-                    headers: { 'Authorization': `Bearer dummy` } // Bypass sementara sebab endpoint kita perlukan token
-                });
+                // Kita guna endpoint baru yang kita baru buat di Worker (selamat, tak dedah nama)
+                const res = await fetch(`${API_BASE_URL}/api/utility/pledges/total?mosque=${MOSQUE_ID}`);
                 
                 if(res.ok) {
-                    const pledges = await res.json();
-                    let totalPaid = 0;
-                    pledges.forEach(p => {
-                        if (p.status === 'Paid') {
-                            totalPaid += parseFloat(p.amount) || 0;
-                        }
-                    });
-                    document.getElementById('totalPledged').innerText = formatSGD(totalPaid);
+                    const data = await res.json();
+                    document.getElementById('totalPledged').innerText = formatSGD(data.total);
                 } else {
-                    // Jika gagal (contoh: Unauthorized), kita letak 0 dulu.
                     document.getElementById('totalPledged').innerText = "$0.00";
                 }
             } catch (error) {
-                console.log("Pledge fetch error (expected if public RLS is off):", error);
+                console.error("Gagal tarik total pledged:", error);
+                document.getElementById('totalPledged').innerText = "$0.00";
             }
         }
 
