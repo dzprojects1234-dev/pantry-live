@@ -55,18 +55,18 @@
         <!-- DASHBOARD SECTION (Hidden initially) -->
         <div id="dashboardSection" class="hidden">
             
-            <!-- BAHAGIAN 1: UPDATE BILL -->
-            <h3>📝 Update Utility Bill</h3>
-            <div class="bill-form">
-                <select id="billType">
-                    <option value="elektrik">⚡ Electricity</option>
-                    <option value="air">💧 Water</option>
-                    <option value="gas">🔥 Gas</option>
-                </select>
-                <input type="text" id="billMonth" placeholder="Month (e.g. Nov 2026)" required>
-                <input type="number" id="billAmount" step="0.01" placeholder="Amount ($)" required>
-                <button class="form-row-full" onclick="saveBill()" id="btnSaveBill">Save Bill</button>
-            </div>
+        <!-- BAHAGIAN 1: UPDATE BILL (Fasa 3) -->
+        <h3>📝 Update Utility Bill (One Month, All Types)</h3>
+        <div class="bill-form">
+            <input type="text" id="billMonth" placeholder="Month (e.g. Nov 2026)" required class="form-row-full">
+            <input type="number" id="billElec" step="0.01" min="0" placeholder="⚡ Electricity ($)">
+            <input type="number" id="billWater" step="0.01" min="0" placeholder="💧 Water ($)">
+            <input type="number" id="billGas" step="0.01" min="0" placeholder="🔥 Gas ($)">
+            <button class="form-row-full" onclick="saveBill()" id="btnSaveBill">💾 Save All Bills</button>
+        </div>
+        <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 0.5rem;">
+            💡 Tip: Leave a field empty or 0 if no bill for that type.
+        </p>
 
             <hr style="border-color: #334155; margin: 2rem 0;">
 
@@ -139,44 +139,58 @@
             fetchPledges();
         }
 
-        // --- LOGIK SIMPAN BIL ---
+                // --- LOGIK SIMPAN BIL (Fasa 3) ---
         function saveBill() {
-            const bill_type = document.getElementById('billType').value;
-            const bill_month = document.getElementById('billMonth').value;
-            const amount = parseFloat(document.getElementById('billAmount').value);
+            const bill_month = document.getElementById('billMonth').value.trim();
+            const elec = parseFloat(document.getElementById('billElec').value) || 0;
+            const water = parseFloat(document.getElementById('billWater').value) || 0;
+            const gas = parseFloat(document.getElementById('billGas').value) || 0;
             const btn = document.getElementById('btnSaveBill');
 
-            if (!bill_month || isNaN(amount)) {
-                alert("Please enter a valid month and amount.");
+            if (!bill_month) {
+                alert("❌ Please enter the month (e.g. Nov 2026).");
+                return;
+            }
+            if (elec <= 0 && water <= 0 && gas <= 0) {
+                alert("❌ Please enter at least one amount (Electricity, Water, or Gas).");
                 return;
             }
 
-            btn.innerText = "Saving...";
+            btn.innerText = "⏳ Saving...";
             btn.disabled = true;
 
-            fetch(`${API_BASE_URL}/api/utility/bills?mosque=${MOSQUE_ID}`, {
+            fetch(`${API_BASE_URL}/api/utility/bills/bulk?mosque=${MOSQUE_ID}`, {
                 method: 'POST',
-                headers: { 
+                headers: {
                     'Authorization': `Bearer ${authToken}`,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ bill_type, bill_month, amount })
+                body: JSON.stringify({ bill_month, elec, water, gas })
             })
             .then(res => {
-                if(!res.ok) throw new Error("Unauthorized or server error");
+                if (!res.ok) throw new Error("Unauthorized or server error");
                 return res.json();
             })
             .then(data => {
-                alert(`✅ Bill for ${bill_month} (${bill_type}) saved successfully!`);
-                document.getElementById('billAmount').value = ''; // Reset amount
-                document.getElementById('billMonth').value = ''; // Reset month
+                if (data.success) {
+                    alert(`✅ Bills for ${bill_month} saved!\n\n` +
+                          `⚡ Electricity: $${elec.toFixed(2)}\n` +
+                          `💧 Water: $${water.toFixed(2)}\n` +
+                          `🔥 Gas: $${gas.toFixed(2)}`);
+                    document.getElementById('billMonth').value = '';
+                    document.getElementById('billElec').value = '';
+                    document.getElementById('billWater').value = '';
+                    document.getElementById('billGas').value = '';
+                } else {
+                    alert("❌ Failed: " + (data.error || "Unknown error"));
+                }
             })
             .catch(err => {
                 alert("❌ Failed to save bill. Your session may have expired.");
                 console.error(err);
             })
             .finally(() => {
-                btn.innerText = "Save Bill";
+                btn.innerText = "💾 Save All Bills";
                 btn.disabled = false;
             });
         }
