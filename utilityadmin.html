@@ -22,6 +22,16 @@
         th { color: #94a3b8; }
         
         .btn-paid { background: #10b981; color: white; padding: 0.4rem 0.8rem; border-radius: 6px; border: none; cursor: pointer; font-weight: bold;}
+        .btn-mark-paid { background: #f59e0b; color: white; padding: 0.4rem 0.8rem; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; }
+        .btn-void { background: #ef4444; color: white; padding: 0.4rem 0.8rem; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; font-size: 0.8rem; margin-left: 5px;}
+        
+        .log-container {
+            background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 1rem; margin-top: 2rem;
+            max-height: 200px; overflow-y: auto; font-size: 0.85rem; color: #cbd5e1;
+        }
+        .log-container h3 { margin-top: 0; margin-bottom: 1rem; color: #f8fafc; border-bottom: none; padding-bottom: 0; font-size: 1rem;}
+        .log-item { margin-bottom: 0.5rem; border-bottom: 1px dashed #334155; padding-bottom: 0.5rem; }
+        .log-time { color: #64748b; font-size: 0.75rem; margin-right: 10px; }
         .status-paid { color: #10b981; font-weight: bold; }
         .status-unpaid { color: #ef4444; font-weight: bold; }
         
@@ -104,6 +114,13 @@
                     <tr><td colspan="5" style="text-align:center;">Loading data...</td></tr>
                 </tbody>
             </table>
+            <!-- ACTIVITY LOGS -->
+            <div class="log-container">
+                <h3>📜 Recent Activity Logs</h3>
+                <div id="logList">
+                    <p style="text-align:center; opacity: 0.5;">Loading logs...</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -231,9 +248,14 @@
 
                 pledges.forEach(p => {
                     const tr = document.createElement('tr');
-                    const actionBtn = p.status === 'Paid' 
-                        ? `<span class="status-paid">PAID ✅</span>` 
-                        : `<button class="btn-paid" onclick="markAsPaid(${p.id})">Mark Paid</button>`;
+                    let actionBtn = '';
+                    if (p.status === 'Paid') {
+                        actionBtn = `<span class="status-paid">PAID ✅</span> <button class="btn-void" onclick="voidPledge(${p.id})">VOID</button>`;
+                    } else if (p.status === 'Void') {
+                        actionBtn = `<span style="color: #ef4444; font-weight: bold;">VOIDED ❌</span>`;
+                    } else {
+                        actionBtn = `<button class="btn-mark-paid" onclick="markAsPaid(${p.id})">Mark Paid</button>`;
+                    }
 
                     tr.innerHTML = `
                         <td>#${p.id}</td>
@@ -271,11 +293,62 @@
                 }
             });
         }
+                // --- LOGIK VOID IKRAR ---
+        function voidPledge(id) {
+            if(!confirm("Are you sure you want to VOID this pledge? This action cannot be undone.")) return;
 
+            fetch(`${API_BASE_URL}/api/utility/void?mosque=${MOSQUE_ID}`, {
+                method: 'POST',
+                headers: { 
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id: id })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    fetchPledges(); // Refresh senarai
+                    fetchLogs();    // Refresh log
+                } else {
+                    alert("Failed to void pledge.");
+                }
+            });
+        }
+
+        // --- LOGIK TARIK ACTIVITY LOGS ---
+        function fetchLogs() {
+            const logDiv = document.getElementById('logList');
+            fetch(`${API_BASE_URL}/api/utility/logs?mosque=${MOSQUE_ID}`, {
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            })
+            .then(res => res.json())
+            .then(logs => {
+                logDiv.innerHTML = '';
+                if (logs.length === 0) {
+                    logDiv.innerHTML = '<p style="text-align:center; opacity: 0.5;">No activity recorded yet.</p>';
+                    return;
+                }
+                logs.forEach(log => {
+                    const date = new Date(log.created_at).toLocaleString();
+                    logDiv.innerHTML += `
+                        <div class="log-item">
+                            <span class="log-time">${date}</span>
+                            <span>${log.description}</span>
+                        </div>
+                    `;
+                });
+            })
+            .catch(err => {
+                logDiv.innerHTML = '<p style="color: red;">Failed to load logs.</p>';
+            });
+        }
         // --- INITIALIZATION ---
         window.onload = () => {
             if (authToken) {
                 showDashboard();
+                fetchLogs(); // <--- TAMBAH BARIS INI
             }
         };
     </script>
