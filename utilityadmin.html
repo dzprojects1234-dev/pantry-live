@@ -55,27 +55,38 @@
         <!-- DASHBOARD SECTION (Hidden initially) -->
         <div id="dashboardSection" class="hidden">
             
-        <!-- BAHAGIAN 1: UPDATE BILL (Fasa 3) -->
+        <!-- BAHAGIAN 1: UPDATE BILL (Fasa 3 - Dropdown Version) -->
         <h3>📝 Update Utility Bill (One Month, All Types)</h3>
         <div class="bill-form">
-            <input type="text" id="billMonth" placeholder="Month (e.g. Nov 2026)" required class="form-row-full">
+            <!-- Dropdown Bulan & Tahun -->
+            <div class="form-row-full" style="display: flex; gap: 10px;">
+                <select id="billMonthSelect" style="flex: 1;">
+                    <option value="Jan">January</option>
+                    <option value="Feb">February</option>
+                    <option value="Mar">March</option>
+                    <option value="Apr">April</option>
+                    <option value="May">May</option>
+                    <option value="Jun">June</option>
+                    <option value="Jul">July</option>
+                    <option value="Aug">August</option>
+                    <option value="Sep">September</option>
+                    <option value="Oct">October</option>
+                    <option value="Nov">November</option>
+                    <option value="Dec">December</option>
+                </select>
+                <select id="billYearSelect" style="flex: 1;">
+                    <option value="2024">2024</option>
+                    <option value="2025">2025</option>
+                    <option value="2026" selected>2026</option>
+                    <option value="2027">2027</option>
+                    <option value="2028">2028</option>
+                </select>
+            </div>
+            
             <input type="number" id="billElec" step="0.01" min="0" placeholder="⚡ Electricity ($)">
             <input type="number" id="billWater" step="0.01" min="0" placeholder="💧 Water ($)">
             <input type="number" id="billGas" step="0.01" min="0" placeholder="🔥 Gas ($)">
             <button class="form-row-full" onclick="saveBill()" id="btnSaveBill">💾 Save All Bills</button>
-        </div>
-        <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 0.5rem;">
-            💡 Tip: Leave a field empty or 0 if no bill for that type.
-        </p>
-
-            <hr style="border-color: #334155; margin: 2rem 0;">
-
-            <!-- BAHAGIAN 2: SENARAI IKAR -->
-            <div class="action-bar">
-                <h3 style="margin: 0; border: none;">Pledge List</h3>
-                <div>
-                    <button class="btn-refresh" onclick="fetchPledges()">🔄 Refresh</button>
-                    <button class="btn-logout" onclick="logout()">Logout</button>
                 </div>
             </div>
             
@@ -139,9 +150,13 @@
             fetchPledges();
         }
 
-                // --- LOGIK SIMPAN BIL (Fasa 3) ---
-        function saveBill() {
-            const bill_month = document.getElementById('billMonth').value.trim();
+             // --- LOGIK SIMPAN BIL (Fasa 3) ---
+            function saveBill() {
+            // Gabungkan bulan dan tahun (contoh: "Dec" + " " + "2026")
+            const selectedMonth = document.getElementById('billMonthSelect').value;
+            const selectedYear = document.getElementById('billYearSelect').value;
+            const bill_month = `${selectedMonth} ${selectedYear}`;
+
             const elec = parseFloat(document.getElementById('billElec').value) || 0;
             const water = parseFloat(document.getElementById('billWater').value) || 0;
             const gas = parseFloat(document.getElementById('billGas').value) || 0;
@@ -177,7 +192,6 @@
                           `⚡ Electricity: $${elec.toFixed(2)}\n` +
                           `💧 Water: $${water.toFixed(2)}\n` +
                           `🔥 Gas: $${gas.toFixed(2)}`);
-                    document.getElementById('billMonth').value = '';
                     document.getElementById('billElec').value = '';
                     document.getElementById('billWater').value = '';
                     document.getElementById('billGas').value = '';
