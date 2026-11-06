@@ -19,13 +19,14 @@
   
   /* Top Bar & Buttons */
   .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px; }
-  .btn-group { display: flex; gap: 6px; flex-wrap: wrap; }
+  .btn-group { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
   .btn-lang, .btn-tool { 
     background: var(--border); color: var(--text); border: none; 
     padding: 6px 12px; border-radius: 6px; font-weight: 700; 
     font-size: 0.8rem; cursor: pointer; width: auto; 
   }
   .btn-lang { background: var(--accent2); color: #0f172a; }
+  .btn-gallery { background: #8b5cf6; color: white; } /* Warna ungu untuk Galeri */
   
   header {
     text-align: center; margin-bottom: 20px; padding: 16px;
@@ -66,11 +67,6 @@
   .task input:checked + label { color: var(--muted); text-decoration: line-through; }
   .note { font-size: 0.8rem; color: var(--warn); margin-top: 4px; display: block; }
 
-  /* Images */
-  .task-img-container { margin-top: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-  .task-img-preview { max-width: 100px; max-height: 100px; border-radius: 8px; border: 1px solid var(--border); object-fit: cover; cursor: pointer; }
-  .btn-img { background: var(--accent2); color: #0f172a; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; font-weight: bold; }
-  
   /* Edit Mode Inputs */
   .edit-input { width: 100%; padding: 8px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text); border-radius: 6px; font-family: inherit; margin-bottom: 4px; }
   .btn-sm { padding: 6px 10px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; border: none; font-weight: bold; }
@@ -78,15 +74,13 @@
   .btn-add { background: var(--accent); color: #0f172a; margin-top: 10px; width: 100%; }
   .btn-del-sec { background: transparent; color: var(--danger); border: 1px solid var(--danger); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; margin-left: auto; }
 
-  /* Adhoc Grid */
+  /* Adhoc Grid & Notes */
   .adhoc-section { margin-top: 24px; }
   .adhoc-section h3 { margin-bottom: 12px; font-size: 1.05rem; color: var(--accent2); }
   .adhoc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
   .adhoc-card { background: var(--card); padding: 12px; border-radius: 12px; border: 1px solid var(--border); }
   .adhoc-card h4 { margin: 0 0 8px 0; font-size: 0.95rem; color: var(--text); }
   .adhoc-textarea { width: 100%; min-height: 80px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 10px; font-family: inherit; resize: vertical; }
-
-  /* Notes */
   .notes-section { background: var(--card); padding: 16px; border-radius: 14px; border: 1px solid var(--border); margin-top: 24px; }
   .notes-section h3 { margin: 0 0 10px 0; font-size: 1.05rem; color: var(--accent2); }
   .notes-textarea { width: 100%; min-height: 100px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 12px; font-family: inherit; resize: vertical; }
@@ -99,6 +93,22 @@
   .btn-danger { background: var(--danger) !important; color: white !important; }
   .badge-done { font-size: 0.7rem; background: var(--accent); color: #0f172a; padding: 2px 6px; border-radius: 5px; font-weight: 700; display: none; }
   .section.complete .badge-done { display: inline-block; }
+
+  /* MODAL (Galeri & Gambar) */
+  .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; flex-direction: column; }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 16px; background: var(--card); border-bottom: 1px solid var(--border); }
+  .modal-header h2 { margin: 0; font-size: 1.2rem; }
+  .modal-body { padding: 16px; overflow-y: auto; flex: 1; }
+  .btn-close { background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+  
+  /* Galeri Gambar Grid */
+  .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+  .gallery-item { background: var(--card); border-radius: 10px; overflow: hidden; border: 1px solid var(--border); display: flex; flex-direction: column; }
+  .gallery-item img { width: 100%; height: 120px; object-fit: cover; cursor: pointer; }
+  .gallery-item-info { padding: 8px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+  .gallery-item-title { font-size: 0.85rem; font-weight: bold; margin-bottom: 8px; word-wrap: break-word; }
+  .gallery-item-actions { display: flex; gap: 6px; }
+  .gallery-item-actions button { flex: 1; font-size: 0.7rem; padding: 4px; }
 
   /* Print Styles */
   @media print {
@@ -119,6 +129,7 @@
 <div class="top-bar">
   <div style="font-weight: bold; font-size: 1.1rem;">🕌 Noja Masjid</div>
   <div class="btn-group">
+    <button class="btn-tool btn-gallery" onclick="openGallery()">📸 Galeri Rujukan</button>
     <button class="btn-tool" onclick="backupJSON()" title="Backup">📥 Backup</button>
     <button class="btn-tool" onclick="document.getElementById('restoreFile').click()" title="Restore">📤 Restore</button>
     <button class="btn-tool" onclick="window.print()" title="Print PDF">🖨️ Print</button>
@@ -157,9 +168,21 @@
   <button class="main-btn btn-danger" id="btnReset" onclick="resetAll()">Reset</button>
 </footer>
 
-<!-- Image Viewer Modal -->
-<div id="imgModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:100; justify-content:center; align-items:center;" onclick="this.style.display='none'">
-  <img id="imgModalSrc" style="max-width:90%; max-height:90%; border-radius:10px;">
+<!-- Modal Galeri Rujukan -->
+<div id="galleryModal" class="modal">
+  <div class="modal-header">
+    <h2>📸 Galeri Rujukan</h2>
+    <button class="btn-close" onclick="closeGallery()">Tutup</button>
+  </div>
+  <div class="modal-body">
+    <button class="btn-tool btn-primary" style="width: 100%; margin-bottom: 16px; padding: 12px; font-size: 1rem;" onclick="triggerGalleryUpload()">+ Tambah Gambar Baru</button>
+    <div class="gallery-grid" id="galleryGrid"></div>
+  </div>
+</div>
+
+<!-- Modal Full Image Viewer -->
+<div id="imgModal" class="modal" style="justify-content: center; align-items: center; background: rgba(0,0,0,0.95);" onclick="if(event.target===this) this.style.display='none'">
+  <img id="imgModalSrc" style="max-width: 100%; max-height: 100%; object-fit: contain;">
 </div>
 
 <script>
@@ -174,7 +197,7 @@ const i18n = {
     adhocPlc: "Contoh: Sedekah roti, tambah mic...",
     resetConfirm: "Padam semua checklist, adhoc, dan nota?",
     addTask: "+ Tambah Tugasan", delTask: "Padam", delSec: "Padam Kotak",
-    addSec: "+ Tambah Kotak Baru", addImg: "📷 Gambar", rmImg: "Buang Gambar",
+    addSec: "+ Tambah Kotak Baru", 
     backupDone: "Backup berjaya dimuat turun!", restoreSuccess: "Data berjaya dipulihkan! Sila refresh page.", restoreError: "Fail tidak sah."
   },
   en: {
@@ -186,7 +209,7 @@ const i18n = {
     adhocPlc: "E.g: Bread donation, extra mic...",
     resetConfirm: "Clear all checklists, adhoc, and notes?",
     addTask: "+ Add Task", delTask: "Delete", delSec: "Delete Box",
-    addSec: "+ Add New Box", addImg: "📷 Image", rmImg: "Remove Image",
+    addSec: "+ Add New Box", 
     backupDone: "Backup downloaded successfully!", restoreSuccess: "Data restored! Please refresh page.", restoreError: "Invalid file."
   }
 };
@@ -194,7 +217,7 @@ const i18n = {
 let currentLang = localStorage.getItem("noja_lang") || "ms";
 let isEditMode = false;
 
-// --- DATA ---
+// --- DATA DEFAULT ---
 const defaultData = [
   {
     time: "4.30 – 4.45",
@@ -269,17 +292,17 @@ const defaultData = [
 ];
 
 // --- STORAGE KEYS ---
-const K_TASKS = "noja_tasks_v3";
-const K_CHECKS = "noja_checks_v3";
-const K_ADHOC = "noja_adhoc_v3";
-const K_NOTES = "noja_notes_v3";
-const K_IMGS = "noja_imgs_v1"; // Base64 Images storage
+const K_TASKS = "noja_tasks_v4";
+const K_CHECKS = "noja_checks_v4";
+const K_ADHOC = "noja_adhoc_v4";
+const K_NOTES = "noja_notes_v4";
+const K_GALLERY = "noja_gallery_v4"; // Array of { id, title, base64 }
 
 let tasksData = JSON.parse(localStorage.getItem(K_TASKS)) || defaultData;
 let checksData = JSON.parse(localStorage.getItem(K_CHECKS)) || {};
 let adhocData = JSON.parse(localStorage.getItem(K_ADHOC)) || {};
 let notesData = localStorage.getItem(K_NOTES) || "";
-let imgsData = JSON.parse(localStorage.getItem(K_IMGS)) || {};
+let galleryData = JSON.parse(localStorage.getItem(K_GALLERY)) || [];
 
 // --- RENDER ---
 function renderTexts() {
@@ -356,46 +379,13 @@ function renderTasks() {
           updateProgress();
         };
 
-        const labelWrap = document.createElement("div");
-        labelWrap.style.flex = "1";
-        
         const lbl = document.createElement("label");
         lbl.htmlFor = key;
         lbl.innerHTML = task.t[currentLang] +
           (task.n ? `<span class="note">${task.n[currentLang]}</span>` : "");
-        labelWrap.appendChild(lbl);
-
-        // Kawasan Gambar (Image area)
-        const imgArea = document.createElement("div");
-        imgArea.className = "task-img-container";
-        
-        if (imgsData[key]) {
-          // Papar gambar sedia ada
-          const img = document.createElement("img");
-          img.src = imgsData[key];
-          img.className = "task-img-preview";
-          img.onclick = () => showImg(imgsData[key]);
-          imgArea.appendChild(img);
-          
-          // Butang padam gambar
-          const rmBtn = document.createElement("button");
-          rmBtn.className = "btn-sm btn-delete";
-          rmBtn.style = "padding:2px 6px; font-size:0.7rem; margin-left:0;";
-          rmBtn.textContent = t.rmImg;
-          rmBtn.onclick = () => removeImg(key, si, ti);
-          imgArea.appendChild(rmBtn);
-        } else {
-          // Butang tambah gambar
-          const addImgBtn = document.createElement("button");
-          addImgBtn.className = "btn-img";
-          addImgBtn.textContent = t.addImg;
-          addImgBtn.onclick = () => triggerImgUpload(key, si, ti);
-          imgArea.appendChild(addImgBtn);
-        }
-        labelWrap.appendChild(imgArea);
 
         wrap.appendChild(cb);
-        wrap.appendChild(labelWrap);
+        wrap.appendChild(lbl);
       }
       body.appendChild(wrap);
     });
@@ -442,52 +432,81 @@ function renderAdhoc() {
   }
 }
 
-function updateProgress() {
-  const all = countAllTasks();
-  const done = Object.values(checksData).filter(Boolean).length;
-  const pct = all ? (done / all * 100) : 0;
-  
-  document.getElementById("fill").style.width = pct + "%";
-  document.getElementById("progressText").textContent = 
-    `${done} / ${all} ${i18n[currentLang].progress} (${Math.round(pct)}%)`;
+// --- GALLERY LOGIC ---
+function openGallery() {
+  document.getElementById("galleryModal").style.display = "flex";
+  renderGallery();
+}
 
-  tasksData.forEach((sec, si) => {
-    const boxes = sec.tasks.map((_, ti) => checksData[`s${si}_t${ti}`]);
-    const allDone = boxes.length > 0 && boxes.every(b => b === true);
-    const el = document.getElementById("sec" + si);
-    if (el) el.classList.toggle("complete", allDone);
+function closeGallery() {
+  document.getElementById("galleryModal").style.display = "none";
+}
+
+function renderGallery() {
+  const grid = document.getElementById("galleryGrid");
+  grid.innerHTML = "";
+  
+  if (galleryData.length === 0) {
+    grid.innerHTML = "<p style='color:var(--muted); grid-column:1/-1; text-align:center;'>Tiada gambar lagi. Tekan butang di atas untuk tambah.</p>";
+    return;
+  }
+  
+  // Susun dari gambar terbaru
+  const reversed = [...galleryData].reverse();
+  
+  reversed.forEach((item, index) => {
+    const card = document.createElement("div");
+    card.className = "gallery-item";
+    card.innerHTML = `
+      <img src="${item.base64}" onclick="viewImage('${item.id}')">
+      <div class="gallery-item-info">
+        <div class="gallery-item-title">${item.title}</div>
+        <div class="gallery-item-actions">
+          <button class="btn-sm" style="background:var(--accent2); color:#0f172a;" onclick="editGalleryTitle('${item.id}')">Edit</button>
+          <button class="btn-sm btn-delete" onclick="deleteGalleryImg('${item.id}')">Padam</button>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
   });
 }
 
-// --- IMAGE HANDLING ---
-function triggerImgUpload(key, si, ti) {
+function triggerGalleryUpload() {
+  const title = prompt("Masukkan tajuk/keterangan gambar (contoh: Panel Aircon Daikin):");
+  if (!title) return; // Batal jika tiada tajuk
+
   const input = document.createElement("input");
   input.type = "file";
   input.accept = "image/*";
-  // attribute capture="environment" membolehkan kamera terbuka terus di phone
   input.setAttribute("capture", "environment"); 
+  
   input.onchange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
     
-    // Compress & resize image to save storage space
     const reader = new FileReader();
     reader.onload = (ev) => {
       const img = new Image();
       img.onload = () => {
         const canvas = document.createElement("canvas");
-        const MAX_WIDTH = 800;
+        // Saiz gambar rujukan boleh lebih besar sikit, cth: max width 1000px
+        const MAX_WIDTH = 1000; 
         const scale = MAX_WIDTH / img.width;
         canvas.width = MAX_WIDTH;
         canvas.height = img.height * scale;
         const ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         
-        // Convert to JPEG base64 with 70% quality
-        const base64 = canvas.toDataURL("image/jpeg", 0.7);
-        imgsData[key] = base64;
-        localStorage.setItem(K_IMGS, JSON.stringify(imgsData));
-        renderTasks(); // Re-render to show image
+        const base64 = canvas.toDataURL("image/jpeg", 0.75); // Kualiti 75%
+        
+        galleryData.push({
+          id: Date.now().toString(),
+          title: title,
+          base64: base64
+        });
+        
+        localStorage.setItem(K_GALLERY, JSON.stringify(galleryData));
+        renderGallery();
       };
       img.src = ev.target.result;
     };
@@ -496,17 +515,31 @@ function triggerImgUpload(key, si, ti) {
   input.click();
 }
 
-function removeImg(key, si, ti) {
-  if (confirm("Buang gambar ini? / Remove this image?")) {
-    delete imgsData[key];
-    localStorage.setItem(K_IMGS, JSON.stringify(imgsData));
-    renderTasks();
+function viewImage(id) {
+  const item = galleryData.find(g => g.id === id);
+  if (item) {
+    document.getElementById("imgModalSrc").src = item.base64;
+    document.getElementById("imgModal").style.display = "flex";
   }
 }
 
-function showImg(base64) {
-  document.getElementById("imgModalSrc").src = base64;
-  document.getElementById("imgModal").style.display = "flex";
+function editGalleryTitle(id) {
+  const item = galleryData.find(g => g.id === id);
+  if (!item) return;
+  const newTitle = prompt("Edit tajuk gambar:", item.title);
+  if (newTitle !== null && newTitle.trim() !== "") {
+    item.title = newTitle.trim();
+    localStorage.setItem(K_GALLERY, JSON.stringify(galleryData));
+    renderGallery();
+  }
+}
+
+function deleteGalleryImg(id) {
+  if (confirm("Padam gambar ini dari galeri?")) {
+    galleryData = galleryData.filter(g => g.id !== id);
+    localStorage.setItem(K_GALLERY, JSON.stringify(galleryData));
+    renderGallery();
+  }
 }
 
 // --- ACTIONS ---
@@ -516,6 +549,9 @@ function toggleLang() {
   renderTexts();
   renderTasks();
   renderAdhoc();
+  if(document.getElementById("galleryModal").style.display === "flex") {
+     renderGallery();
+  }
 }
 
 function toggleEditMode() {
@@ -591,7 +627,6 @@ function resetAll() {
     localStorage.removeItem(K_CHECKS);
     localStorage.removeItem(K_ADHOC);
     localStorage.removeItem(K_NOTES);
-    // Kita kekalkan data tasks dan imgs, cuma reset checklist & notes
     document.getElementById("mainNotes").value = "";
     renderTasks();
     renderAdhoc();
@@ -603,14 +638,31 @@ function expandAll() {
   document.querySelectorAll(".section").forEach(s => s.classList.toggle("open"));
 }
 
-// --- BACKUP & RESTORE & PRINT ---
+function updateProgress() {
+  const all = countAllTasks();
+  const done = Object.values(checksData).filter(Boolean).length;
+  const pct = all ? (done / all * 100) : 0;
+  
+  document.getElementById("fill").style.width = pct + "%";
+  document.getElementById("progressText").textContent = 
+    `${done} / ${all} ${i18n[currentLang].progress} (${Math.round(pct)}%)`;
+
+  tasksData.forEach((sec, si) => {
+    const boxes = sec.tasks.map((_, ti) => checksData[`s${si}_t${ti}`]);
+    const allDone = boxes.length > 0 && boxes.every(b => b === true);
+    const el = document.getElementById("sec" + si);
+    if (el) el.classList.toggle("complete", allDone);
+  });
+}
+
+// --- BACKUP & RESTORE ---
 function backupJSON() {
   const backupData = {
     tasks: tasksData,
     checks: checksData,
     adhoc: adhocData,
     notes: notesData,
-    imgs: imgsData // Sertakan gambar dalam backup (Base64)
+    gallery: galleryData // Sertakan galeri gambar
   };
   
   const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: "application/json" });
@@ -636,16 +688,16 @@ function restoreJSON(input) {
         checksData = data.checks || {};
         adhocData = data.adhoc || {};
         notesData = data.notes || "";
-        imgsData = data.imgs || {};
+        galleryData = data.gallery || [];
         
         localStorage.setItem(K_TASKS, JSON.stringify(tasksData));
         localStorage.setItem(K_CHECKS, JSON.stringify(checksData));
         localStorage.setItem(K_ADHOC, JSON.stringify(adhocData));
         localStorage.setItem(K_NOTES, notesData);
-        localStorage.setItem(K_IMGS, JSON.stringify(imgsData));
+        localStorage.setItem(K_GALLERY, JSON.stringify(galleryData));
         
         alert(i18n[currentLang].restoreSuccess);
-        location.reload(); // Refresh untuk paparkan data baru
+        location.reload(); 
       } else {
         alert(i18n[currentLang].restoreError);
       }
@@ -654,7 +706,7 @@ function restoreJSON(input) {
     }
   };
   reader.readAsText(file);
-  input.value = ""; // Reset input
+  input.value = "";
 }
 
 // --- CLOCK ---
