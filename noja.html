@@ -17,7 +17,7 @@
     line-height: 1.5;
   }
   
-  /* Top Bar & Buttons */
+  /* Top Bar */
   .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px; }
   .btn-group { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
   .btn-lang, .btn-tool { 
@@ -28,6 +28,14 @@
   .btn-lang { background: var(--accent2); color: #0f172a; }
   .btn-gallery { background: #8b5cf6; color: white; }
   
+  /* Shift Toggle */
+  .shift-toggle { display: flex; gap: 10px; margin-bottom: 12px; justify-content: center; }
+  .shift-btn { 
+    background: var(--card); border: 2px solid var(--border); color: var(--text); 
+    padding: 10px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.2s;
+  }
+  .shift-btn.active { background: var(--accent2); color: #0f172a; border-color: var(--accent2); }
+
   header {
     text-align: center; margin-bottom: 20px; padding: 16px;
     background: linear-gradient(135deg, #166534, #065f46); border-radius: 16px;
@@ -73,6 +81,7 @@
   .btn-delete { background: var(--danger); color: white; margin-left: 8px; }
   .btn-add { background: var(--accent); color: #0f172a; margin-top: 10px; width: 100%; }
   .btn-del-sec { background: transparent; color: var(--danger); border: 1px solid var(--danger); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; margin-left: auto; }
+  .btn-check-all { background: var(--accent2); color: #0f172a; margin-bottom: 8px; width: 100%; padding: 8px; border-radius: 6px; font-weight: bold; border: none; cursor: pointer; }
 
   /* Adhoc Grid & Notes */
   .adhoc-section { margin-top: 24px; }
@@ -113,7 +122,7 @@
   /* Print */
   @media print {
     body { background: white; color: black; padding: 0; }
-    header, .progress-wrap, footer, .top-bar, .adhoc-section, .notes-section, .btn-sm, .btn-delete, .btn-add, .btn-del-sec, .arrow { display: none !important; }
+    header, .progress-wrap, footer, .top-bar, .adhoc-section, .notes-section, .btn-sm, .btn-delete, .btn-add, .btn-del-sec, .arrow, .shift-toggle, .btn-check-all { display: none !important; }
     .section { border: 1px solid #ccc; page-break-inside: avoid; margin-bottom: 15px; background: white; }
     .section-head { background: #eee !important; color: black; }
     .section-body { display: block !important; }
@@ -136,6 +145,12 @@
     <button class="btn-lang" id="langBtn" onclick="toggleLang()">EN</button>
   </div>
   <input type="file" id="restoreFile" accept=".json" style="display:none" onchange="restoreJSON(this)">
+</div>
+
+<!-- Shift Toggle -->
+<div class="shift-toggle">
+  <button class="shift-btn active" id="shiftMorningBtn" onclick="setShift('morning')">🌅 Shift Pagi</button>
+  <button class="shift-btn" id="shiftEveningBtn" onclick="setShift('evening')">🌙 Shift Petang</button>
 </div>
 
 <header>
@@ -191,7 +206,7 @@
 // ==========================================
 const i18n = {
   ms: {
-    title: "Prosedur Kerja Noja Masjid", subtitle: "Rutin Harian · 4.30 pagi – 9.00 pagi",
+    title: "Prosedur Kerja Noja Masjid", subtitle: "Rutin Harian",
     expand: "Buka Semua", edit: "✏️ Edit", save: "💾 Simpan", reset: "Reset",
     progress: "selesai", adhocTitle: "📌 Tugasan Mingguan",
     notesTitle: "📝 Nota Peribadi", notesPlc: "Tulis nota di sini...",
@@ -199,7 +214,7 @@ const i18n = {
     adhocPlc: "Contoh: Sedekah roti, tambah mic...",
     resetConfirm: "Padam semua checklist, adhoc, dan nota?",
     addTask: "+ Tambah Tugasan", delTask: "Padam", delSec: "Padam Kotak",
-    addSec: "+ Tambah Kotak Baru",
+    addSec: "+ Tambah Kotak Baru", checkAll: "✓ Semak Semua",
     backupBtn: "📥 Backup", restoreBtn: "📤 Restore", printBtn: "🖨️ Print",
     galleryBtn: "📸 Galeri Rujukan", galleryTitle: "📸 Galeri Rujukan",
     addImgBtn: "+ Tambah Gambar Baru", closeBtn: "Tutup",
@@ -210,10 +225,11 @@ const i18n = {
     confirmDelImg: "Padam gambar ini dari galeri?",
     confirmDelTask: "Padam tugasan ini?",
     confirmDelSec: "Padam kotak ini?",
-    backupDone: "Backup berjaya dimuat turun!", restoreSuccess: "Data berjaya dipulihkan! Sila refresh page.", restoreError: "Fail tidak sah."
+    backupDone: "Backup berjaya dimuat turun!", restoreSuccess: "Data berjaya dipulihkan! Sila refresh page.", restoreError: "Fail tidak sah.",
+    shiftMorning: "🌅 Shift Pagi", shiftEvening: "🌙 Shift Petang"
   },
   en: {
-    title: "Mosque Maintenance Procedure", subtitle: "Daily Routine · 4.30 am – 9.00 am",
+    title: "Mosque Maintenance Procedure", subtitle: "Daily Routine",
     expand: "Expand All", edit: "✏️ Edit", save: "💾 Save", reset: "Reset",
     progress: "done", adhocTitle: "📌 Weekly Tasks",
     notesTitle: "📝 Personal Notes", notesPlc: "Write notes here...",
@@ -221,7 +237,7 @@ const i18n = {
     adhocPlc: "E.g: Bread donation, extra mic...",
     resetConfirm: "Clear all checklists, adhoc, and notes?",
     addTask: "+ Add Task", delTask: "Delete", delSec: "Delete Box",
-    addSec: "+ Add New Box",
+    addSec: "+ Add New Box", checkAll: "✓ Check All",
     backupBtn: "📥 Backup", restoreBtn: "📤 Restore", printBtn: "🖨️ Print",
     galleryBtn: "📸 Ref Gallery", galleryTitle: "📸 Reference Gallery",
     addImgBtn: "+ Add New Image", closeBtn: "Close",
@@ -232,17 +248,15 @@ const i18n = {
     confirmDelImg: "Delete this image from gallery?",
     confirmDelTask: "Delete this task?",
     confirmDelSec: "Delete this box?",
-    backupDone: "Backup downloaded successfully!", restoreSuccess: "Data restored! Please refresh page.", restoreError: "Invalid file."
+    backupDone: "Backup downloaded successfully!", restoreSuccess: "Data restored! Please refresh page.", restoreError: "Invalid file.",
+    shiftMorning: "🌅 Morning Shift", shiftEvening: "🌙 Evening Shift"
   }
 };
 
 // ==========================================
-// STATE & VARIABLES
+// DATA STRUCTURES (MORNING & EVENING SHIFTS)
 // ==========================================
-let currentLang = localStorage.getItem("noja_lang") || "ms";
-let isEditMode = false;
-
-const defaultData = [
+const defaultMorningData = [
   {
     time: "4.30 – 4.45",
     title: { ms: "Buka Kunci & Keselamatan", en: "Unlock & Safety" },
@@ -304,29 +318,91 @@ const defaultData = [
   },
   {
     time: "8.30 – 9.00",
-    title: { ms: "Tutup Syif & Laporan", en: "End Shift & Report" },
+    title: { ms: "Tutup Syif Pagi & Laporan", en: "End Morning Shift & Report" },
     tasks: [
-      { t: { ms: "Off sistem Sound & Aircon", en: "Off Sound & Aircon systems" } },
       { t: { ms: "Off Live Streaming (OBS)", en: "Off Live Streaming (OBS)" } },
-      { t: { ms: "Off sistem Lif (jika on duty)", en: "Off Lift system (if on duty)" } },
-      { t: { ms: "Kunci semula tangga & pintu", en: "Lock stairs & doors again" } },
       { t: { ms: "Catat dalam buku log", en: "Log in the book" } }
     ]
   }
 ];
 
-// Storage Keys
-const K_TASKS = "noja_tasks_v5";
-const K_CHECKS = "noja_checks_v5";
-const K_ADHOC = "noja_adhoc_v5";
-const K_NOTES = "noja_notes_v5";
-const K_GALLERY = "noja_gallery_v5";
+const defaultEveningData = [
+  {
+    time: "5.30 – 6.30",
+    title: { ms: "Persiapan Awal Petang", en: "Early Evening Prep" },
+    tasks: [
+      { t: { ms: "Buka kunci pagar masjid & pintu utama", en: "Unlock mosque gate & main doors" } },
+      { t: { ms: "On suis utama (DB), lampu & sistem lif", en: "On main switch (DB), lights & lift system" } },
+      { t: { ms: "On sistem Sound & Aircon (jika ada kelas)", en: "On Sound & Aircon systems (if there are classes)" } }
+    ]
+  },
+  {
+    time: "6.30 – 7.30",
+    title: { ms: "Pembersihan & Vacuum", en: "Cleaning & Vacuum" },
+    tasks: [
+      { t: { ms: "Vacuum karpet ruang solat utama", en: "Vacuum main prayer hall carpet" } },
+      { t: { ms: "Kemas & susun tabung-tabung kuliah", en: "Tidy & arrange donation boxes" } },
+      { t: { ms: "Kemas karpet PMD (pastikan tak tersadung)", en: "Tidy PMD carpet (ensure no tripping)" } },
+      { t: { ms: "Bersihkan tandas & tempat wuduk", en: "Clean toilets & ablution area" } }
+    ]
+  },
+  {
+    time: "7.30 – 8.30",
+    title: { ms: "Semasa Aktiviti / Kelas", en: "During Activities / Classes" },
+    tasks: [
+      { t: { ms: "Pantau keperluan kelas / jemaah", en: "Monitor class / jemaah needs" } },
+      { t: { ms: "Semak PA system berfungsi lancar", en: "Check PA system is working smoothly" } },
+      { t: { ms: "Sediakan air minuman", en: "Prepare drinking water" } }
+    ]
+  },
+  {
+    time: "8.30 – 9.30",
+    title: { ms: "Semakan Kelas & QR Clocking", en: "Class Check & QR Clocking" },
+    tasks: [
+      { t: { ms: "Scan QR Code di 11 lokasi masjid", en: "Scan QR Code at 11 mosque locations" } },
+      { t: { ms: "Periksa semua tingkap & pintu kelas ditutup", en: "Check all classroom windows & doors are closed" } },
+      { t: { ms: "Semak tandas & tempat wuduk terakhir kali", en: "Final check on toilets & ablution area" } }
+    ]
+  },
+  {
+    time: "9.30 – 10.30",
+    title: { ms: "Tutup Masjid & Keselamatan", en: "Lock Up & Safety" },
+    tasks: [
+      { t: { ms: "Off semua Aircon (Daikin/Mitsubishi)", en: "Off all Aircon (Daikin/Mitsubishi)" } },
+      { t: { ms: "Off kipas besar (Helicopter), kipas siling & standing fan", en: "Off big fan (Helicopter), ceiling fans & standing fans" } },
+      { t: { ms: "Off lampu & sistem Sound", en: "Off lights & Sound system" } },
+      { t: { ms: "Off sistem Lif", en: "Off Lift system" } },
+      { t: { ms: "Tutup semua tingkap", en: "Close all windows" } },
+      { t: { ms: "Kunci pintu utama, tangga & pagar masjid", en: "Lock main doors, stairs & mosque gate" } }
+    ]
+  }
+];
 
-let tasksData = JSON.parse(localStorage.getItem(K_TASKS)) || defaultData;
+// ==========================================
+// STATE & VARIABLES
+// ==========================================
+let currentLang = localStorage.getItem("noja_lang") || "ms";
+let currentShift = localStorage.getItem("noja_shift") || "morning";
+let isEditMode = false;
+
+// Storage Keys (v6 for dual shifts)
+const K_TASKS_M = "noja_tasks_m_v6";
+const K_TASKS_E = "noja_tasks_e_v6";
+const K_CHECKS = "noja_checks_v6"; // Stores checks for both shifts
+const K_ADHOC = "noja_adhoc_v6";
+const K_NOTES = "noja_notes_v6";
+const K_GALLERY = "noja_gallery_v6";
+
+let tasksMorning = JSON.parse(localStorage.getItem(K_TASKS_M)) || defaultMorningData;
+let tasksEvening = JSON.parse(localStorage.getItem(K_TASKS_E)) || defaultEveningData;
 let checksData = JSON.parse(localStorage.getItem(K_CHECKS)) || {};
 let adhocData = JSON.parse(localStorage.getItem(K_ADHOC)) || {};
 let notesData = localStorage.getItem(K_NOTES) || "";
 let galleryData = JSON.parse(localStorage.getItem(K_GALLERY)) || [];
+
+function getCurrentTasks() {
+  return currentShift === "morning" ? tasksMorning : tasksEvening;
+}
 
 // ==========================================
 // RENDER FUNCTIONS (UI UPDATES)
@@ -334,12 +410,16 @@ let galleryData = JSON.parse(localStorage.getItem(K_GALLERY)) || [];
 function renderTexts() {
   const t = i18n[currentLang];
   
-  // Top Bar & Header
   document.getElementById("title").textContent = t.title;
-  document.getElementById("subtitle").textContent = t.subtitle;
+  document.getElementById("subtitle").textContent = 
+    currentShift === "morning" ? `${t.subtitle} · 4.30 am – 9.00 am` : `${t.subtitle} · 5.30 pm – 10.30 pm`;
   document.getElementById("langBtn").textContent = currentLang === "ms" ? "EN" : "BM";
   
-  // Buttons
+  document.getElementById("shiftMorningBtn").textContent = t.shiftMorning;
+  document.getElementById("shiftEveningBtn").textContent = t.shiftEvening;
+  document.getElementById("shiftMorningBtn").className = currentShift === "morning" ? "shift-btn active" : "shift-btn";
+  document.getElementById("shiftEveningBtn").className = currentShift === "evening" ? "shift-btn active" : "shift-btn";
+
   document.getElementById("btnGallery").textContent = t.galleryBtn;
   document.getElementById("btnBackup").textContent = t.backupBtn;
   document.getElementById("btnRestore").textContent = t.restoreBtn;
@@ -348,12 +428,10 @@ function renderTexts() {
   document.getElementById("btnEdit").textContent = isEditMode ? t.save : t.edit;
   document.getElementById("btnReset").textContent = t.reset;
   
-  // Sections
   document.getElementById("adhocTitle").textContent = t.adhocTitle;
   document.getElementById("notesTitle").textContent = t.notesTitle;
   document.getElementById("mainNotes").placeholder = t.notesPlc;
   
-  // Gallery Modal
   document.getElementById("galleryTitle").textContent = t.galleryTitle;
   document.getElementById("btnCloseGallery").textContent = t.closeBtn;
   document.getElementById("btnAddGallery").textContent = t.addImgBtn;
@@ -362,13 +440,14 @@ function renderTexts() {
 }
 
 function countAllTasks() {
-  return tasksData.reduce((acc, sec) => acc + sec.tasks.length, 0);
+  return getCurrentTasks().reduce((acc, sec) => acc + sec.tasks.length, 0);
 }
 
 function renderTasks() {
   const container = document.getElementById("sections");
   container.innerHTML = "";
   const t = i18n[currentLang];
+  const tasksData = getCurrentTasks();
   
   tasksData.forEach((sec, si) => {
     const div = document.createElement("div");
@@ -391,8 +470,26 @@ function renderTasks() {
     const body = document.createElement("div");
     body.className = "section-body";
 
+    // Add "Check All" button if in Edit Mode (useful for closing shift)
+    if (isEditMode) {
+      const checkAllBtn = document.createElement("button");
+      checkAllBtn.className = "btn-check-all";
+      checkAllBtn.textContent = t.checkAll;
+      checkAllBtn.onclick = () => {
+        sec.tasks.forEach((_, ti) => {
+          const key = `s${currentShift}_${si}_t${ti}`;
+          checksData[key] = true;
+          const cb = document.getElementById(key);
+          if (cb) cb.checked = true;
+        });
+        localStorage.setItem(K_CHECKS, JSON.stringify(checksData));
+        updateProgress();
+      };
+      body.appendChild(checkAllBtn);
+    }
+
     sec.tasks.forEach((task, ti) => {
-      const key = `s${si}_t${ti}`;
+      const key = `s${currentShift}_${si}_t${ti}`; // Differentiate keys per shift
       const wrap = document.createElement("div");
       wrap.className = "task";
 
@@ -473,8 +570,13 @@ function renderAdhoc() {
 }
 
 function updateProgress() {
+  const tasksData = getCurrentTasks();
   const all = countAllTasks();
-  const done = Object.values(checksData).filter(Boolean).length;
+  // Count only checked items for the current shift
+  const done = tasksData.reduce((acc, sec, si) => {
+    return acc + sec.tasks.filter((_, ti) => checksData[`s${currentShift}_${si}_t${ti}`] === true).length;
+  }, 0);
+  
   const pct = all ? (done / all * 100) : 0;
   
   document.getElementById("fill").style.width = pct + "%";
@@ -482,11 +584,96 @@ function updateProgress() {
     `${done} / ${all} ${i18n[currentLang].progress} (${Math.round(pct)}%)`;
 
   tasksData.forEach((sec, si) => {
-    const boxes = sec.tasks.map((_, ti) => checksData[`s${si}_t${ti}`]);
+    const boxes = sec.tasks.map((_, ti) => checksData[`s${currentShift}_${si}_t${ti}`]);
     const allDone = boxes.length > 0 && boxes.every(b => b === true);
     const el = document.getElementById("sec" + si);
     if (el) el.classList.toggle("complete", allDone);
   });
+}
+
+// ==========================================
+// SHIFT & EDIT LOGIC
+// ==========================================
+function setShift(shift) {
+  currentShift = shift;
+  localStorage.setItem("noja_shift", currentShift);
+  isEditMode = false; // Reset edit mode when changing shift
+  renderTexts();
+  renderTasks();
+}
+
+function toggleEditMode() {
+  isEditMode = !isEditMode;
+  renderTexts();
+  renderTasks();
+  if (!isEditMode) {
+    if (currentShift === "morning") {
+      localStorage.setItem(K_TASKS_M, JSON.stringify(tasksMorning));
+    } else {
+      localStorage.setItem(K_TASKS_E, JSON.stringify(tasksEvening));
+    }
+  }
+}
+
+function updateTaskText(si, ti, val) {
+  const tasksData = getCurrentTasks();
+  tasksData[si].tasks[ti].t[currentLang] = val;
+}
+
+function updateTaskNote(si, ti, val) {
+  const tasksData = getCurrentTasks();
+  if(tasksData[si].tasks[ti].n) {
+    tasksData[si].tasks[ti].n[currentLang] = val;
+  } else {
+    tasksData[si].tasks[ti].n = { ms: val, en: val };
+  }
+}
+
+function deleteTask(si, ti) {
+  if(confirm(i18n[currentLang].confirmDelTask)) {
+    const tasksData = getCurrentTasks();
+    tasksData[si].tasks.splice(ti, 1);
+    renderTasks();
+    saveTasksToStorage();
+  }
+}
+
+function addTask(si) {
+  const tasksData = getCurrentTasks();
+  tasksData[si].tasks.push({
+    t: { ms: "Tugasan Baru", en: "New Task" },
+    n: { ms: "", en: "" }
+  });
+  renderTasks();
+  saveTasksToStorage();
+}
+
+function deleteSection(si) {
+  if(confirm(i18n[currentLang].confirmDelSec)) {
+    const tasksData = getCurrentTasks();
+    tasksData.splice(si, 1);
+    renderTasks();
+    saveTasksToStorage();
+  }
+}
+
+function addSection() {
+  const tasksData = getCurrentTasks();
+  tasksData.push({
+    time: "Time",
+    title: { ms: "Kotak Baru", en: "New Box" },
+    tasks: [{ t: { ms: "Tugasan Baru", en: "New Task" }, n: { ms: "", en: "" } }]
+  });
+  renderTasks();
+  saveTasksToStorage();
+}
+
+function saveTasksToStorage() {
+  if (currentShift === "morning") {
+    localStorage.setItem(K_TASKS_M, JSON.stringify(tasksMorning));
+  } else {
+    localStorage.setItem(K_TASKS_E, JSON.stringify(tasksEvening));
+  }
 }
 
 // ==========================================
@@ -548,7 +735,6 @@ function triggerGalleryUpload() {
     reader.onload = (ev) => {
       const img = new Image();
       img.onload = () => {
-        // Resize image to save local storage space
         const canvas = document.createElement("canvas");
         const MAX_WIDTH = 1000; 
         const scale = MAX_WIDTH / img.width;
@@ -603,7 +789,7 @@ function deleteGalleryImg(id) {
 }
 
 // ==========================================
-// ACTIONS & EDITING
+// GENERAL ACTIONS
 // ==========================================
 function toggleLang() {
   currentLang = currentLang === "ms" ? "en" : "ms";
@@ -614,62 +800,6 @@ function toggleLang() {
   if(document.getElementById("galleryModal").style.display === "flex") {
      renderGallery();
   }
-}
-
-function toggleEditMode() {
-  isEditMode = !isEditMode;
-  renderTexts();
-  renderTasks();
-  if (!isEditMode) {
-    localStorage.setItem(K_TASKS, JSON.stringify(tasksData));
-  }
-}
-
-function updateTaskText(si, ti, val) {
-  tasksData[si].tasks[ti].t[currentLang] = val;
-}
-
-function updateTaskNote(si, ti, val) {
-  if(tasksData[si].tasks[ti].n) {
-    tasksData[si].tasks[ti].n[currentLang] = val;
-  } else {
-    tasksData[si].tasks[ti].n = { ms: val, en: val };
-  }
-}
-
-function deleteTask(si, ti) {
-  if(confirm(i18n[currentLang].confirmDelTask)) {
-    tasksData[si].tasks.splice(ti, 1);
-    renderTasks();
-    localStorage.setItem(K_TASKS, JSON.stringify(tasksData));
-  }
-}
-
-function addTask(si) {
-  tasksData[si].tasks.push({
-    t: { ms: "Tugasan Baru", en: "New Task" },
-    n: { ms: "", en: "" }
-  });
-  renderTasks();
-  localStorage.setItem(K_TASKS, JSON.stringify(tasksData));
-}
-
-function deleteSection(si) {
-  if(confirm(i18n[currentLang].confirmDelSec)) {
-    tasksData.splice(si, 1);
-    renderTasks();
-    localStorage.setItem(K_TASKS, JSON.stringify(tasksData));
-  }
-}
-
-function addSection() {
-  tasksData.push({
-    time: "Time",
-    title: { ms: "Kotak Baru", en: "New Box" },
-    tasks: [{ t: { ms: "Tugasan Baru", en: "New Task" }, n: { ms: "", en: "" } }]
-  });
-  renderTasks();
-  localStorage.setItem(K_TASKS, JSON.stringify(tasksData));
 }
 
 function saveAdhoc(index, val) {
@@ -705,7 +835,8 @@ function expandAll() {
 // ==========================================
 function backupJSON() {
   const backupData = {
-    tasks: tasksData,
+    tasksMorning: tasksMorning,
+    tasksEvening: tasksEvening,
     checks: checksData,
     adhoc: adhocData,
     notes: notesData,
@@ -730,14 +861,16 @@ function restoreJSON(input) {
   reader.onload = (e) => {
     try {
       const data = JSON.parse(e.target.result);
-      if (data.tasks) {
-        tasksData = data.tasks;
+      if (data.tasksMorning && data.tasksEvening) {
+        tasksMorning = data.tasksMorning;
+        tasksEvening = data.tasksEvening;
         checksData = data.checks || {};
         adhocData = data.adhoc || {};
         notesData = data.notes || "";
         galleryData = data.gallery || [];
         
-        localStorage.setItem(K_TASKS, JSON.stringify(tasksData));
+        localStorage.setItem(K_TASKS_M, JSON.stringify(tasksMorning));
+        localStorage.setItem(K_TASKS_E, JSON.stringify(tasksEvening));
         localStorage.setItem(K_CHECKS, JSON.stringify(checksData));
         localStorage.setItem(K_ADHOC, JSON.stringify(adhocData));
         localStorage.setItem(K_NOTES, notesData);
@@ -781,7 +914,10 @@ function init() {
   renderTasks();
   renderAdhoc();
   tick();
-  document.getElementById("sec0").classList.add("open");
+  
+  // Buka section pertama secara automatik
+  const firstSec = document.getElementById("sec0");
+  if (firstSec) firstSec.classList.add("open");
 }
 
 init();
