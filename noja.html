@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Noja Masjid App</title>
+<style>
+  :root {
+    --bg: #0f172a; --card: #1e293b; --accent: #22c55e; --accent2: #38bdf8;
+    --text: #e2e8f0; --muted: #94a3b8; --warn: #f59e0b; --danger: #ef4444;
+    --border: #334155; --input-bg: #0b1220;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg); color: var(--text); padding: 16px; padding-bottom: 100px;
+    line-height: 1.5;
+  }
+  
+  /* Header & Top Bar */
+  .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .btn-lang { background: var(--accent2); color: #0f172a; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+  
+  header {
+    text-align: center; margin-bottom: 20px; padding: 16px;
+    background: linear-gradient(135deg, #166534, #065f46); border-radius: 16px;
+  }
+  header h1 { margin: 0; font-size: 1.4rem; }
+  header p { margin: 6px 0 0; color: #bbf7d0; font-size: 0.9rem; }
+  .date-display { font-size: 1rem; font-weight: bold; color: #fff; margin-top: 8px; }
+  .clock { font-size: 1.6rem; font-weight: 700; margin-top: 4px; color: #fff; font-variant-numeric: tabular-nums; }
+
+  /* Progress */
+  .progress-wrap { position: sticky; top: 0; z-index: 10; background: var(--bg); padding: 10px 0; margin-bottom: 8px; }
+  .progress-bar { height: 12px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 99px; transition: width 0.3s; }
+  .progress-text { text-align: center; font-size: 0.8rem; color: var(--muted); margin-top: 6px; }
+
+  /* Sections */
+  .section { background: var(--card); border-radius: 14px; margin-bottom: 14px; overflow: hidden; border: 1px solid var(--border); }
+  .section-head { display: flex; align-items: center; gap: 10px; padding: 14px 16px; cursor: pointer; user-select: none; background: #243447; flex-wrap: wrap; }
+  .section-head .time { background: var(--accent2); color: #0f172a; font-weight: 700; font-size: 0.72rem; padding: 3px 8px; border-radius: 6px; white-space: nowrap; }
+  .section-head h2 { margin: 0; font-size: 1rem; flex: 1; }
+  .section-head .arrow { transition: transform 0.25s; color: var(--muted); }
+  .section.open .arrow { transform: rotate(90deg); }
+  .section-body { display: none; padding: 6px 16px 14px; }
+  .section.open .section-body { display: block; }
+
+  /* Tasks */
+  .task { display: flex; gap: 10px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid #2d3b4f; }
+  .task:last-child { border-bottom: none; }
+  .task input[type="checkbox"] {
+    appearance: none; width: 22px; height: 22px; min-width: 22px;
+    border: 2px solid var(--muted); border-radius: 6px; margin-top: 2px;
+    cursor: pointer; position: relative; transition: 0.2s;
+  }
+  .task input[type="checkbox"]:checked { background: var(--accent); border-color: var(--accent); }
+  .task input[type="checkbox"]:checked::after { content: "✓"; position: absolute; color: #0f172a; font-weight: 900; font-size: 15px; left: 4px; top: -2px; }
+  .task label { flex: 1; font-size: 0.95rem; cursor: pointer; }
+  .task input:checked + label { color: var(--muted); text-decoration: line-through; }
+  .note { font-size: 0.8rem; color: var(--warn); margin-top: 4px; display: block; }
+  .danger-note { color: var(--danger); }
+
+  /* Edit Mode (Inputs) */
+  .edit-input { width: 100%; padding: 8px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text); border-radius: 6px; font-family: inherit; }
+  .btn-delete { background: var(--danger); color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; margin-left: 8px; }
+
+  /* 7-Day Adhoc Grid */
+  .adhoc-section { margin-top: 24px; }
+  .adhoc-section h3 { margin-bottom: 12px; font-size: 1.1rem; color: var(--accent2); }
+  .adhoc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+  .adhoc-card { background: var(--card); padding: 12px; border-radius: 12px; border: 1px solid var(--border); }
+  .adhoc-card h4 { margin: 0 0 8px 0; font-size: 1rem; color: var(--text); }
+  .adhoc-textarea { width: 100%; min-height: 80px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 10px; font-family: inherit; resize: vertical; }
+
+  /* Notes Section */
+  .notes-section { background: var(--card); padding: 16px; border-radius: 14px; border: 1px solid var(--border); margin-top: 24px; }
+  .notes-section h3 { margin: 0 0 10px 0; font-size: 1.1rem; color: var(--accent2); }
+  .notes-textarea { width: 100%; min-height: 100px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 12px; font-family: inherit; resize: vertical; }
+
+  /* Footer / Action Bar */
+  footer { position: fixed; bottom: 0; left: 0; right: 0; background: #0b1220; padding: 12px 16px; display: flex; gap: 10px; border-top: 1px solid var(--border); z-index: 20; flex-wrap: wrap; }
+  button { flex: 1; padding: 12px; border: none; border-radius: 10px; font-weight: 600; font-size: 0.9rem; cursor: pointer; background: var(--border); color: var(--text); transition: 0.2s; }
+  button:active { opacity: 0.8; }
+  .btn-primary { background: var(--accent2); color: #0f172a; }
+  .btn-danger { background: var(--danger); color: white; }
+  .badge-done { font-size: 0.7rem; background: var(--accent); color: #0f172a; padding: 2px 6px; border-radius: 5px; font-weight: 700; display: none; }
+  .section.complete .badge-done { display: inline-block; }
+
+  @media (max-width: 600px) {
+    .section-head h2 { font-size: 0.9rem; }
+    .btn-delete { padding: 6px; font-size: 0.7rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div style="font-weight: bold; font-size: 1.1rem;">🕌 Noja Masjid</div>
+  <button class="btn-lang" id="langBtn" onclick="toggleLang()">🇬🇧 EN</button>
+</div>
+
+<header>
+  <h1 id="title">Prosedur Kerja Noja Masjid</h1>
+  <p id="subtitle">Rutin Harian · 4.30 pagi – 9.00 pagi</p>
+  <div class="date-display" id="dateDisplay">--</div>
+  <div class="clock" id="clock">--:--:--</div>
+</header>
+
+<div class="progress-wrap">
+  <div class="progress-bar"><div class="progress-fill" id="fill"></div></div>
+  <div class="progress-text" id="progressText">0 / 0 selesai</div>
+</div>
+
+<div id="sections"></div>
+
+<!-- Adhoc Tasks -->
+<div class="adhoc-section">
+  <h3 id="adhocTitle">📌 Tugasan Adhoc (Mingguan)</h3>
+  <div class="adhoc-grid" id="adhocGrid"></div>
+</div>
+
+<!-- Notes -->
+<div class="notes-section">
+  <h3 id="notesTitle">📝 Nota Laporan / Peringatan</h3>
+  <textarea class="notes-textarea" id="mainNotes" placeholder="Tulis nota di sini..."></textarea>
+</div>
+
+<footer>
+  <button id="btnExpand" onclick="expandAll()">Buka Semua</button>
+  <button id="btnEdit" class="btn-primary" onclick="toggleEditMode()">✏️ Edit</button>
+  <button id="btnReset" class="btn-danger" onclick="resetAll()">Reset</button>
+</footer>
+
+<script>
+// --- TRANSLATIONS ---
+const i18n = {
+  ms: {
+    title: "Prosedur Kerja Noja Masjid", subtitle: "Rutin Harian · 4.30 pagi – 9.00 pagi",
+    expand: "Buka Semua", edit: "✏️ Edit", save: "💾 Simpan", reset: "Reset",
+    progress: "selesai", adhocTitle: "📌 Tugasan Adhoc (Mingguan)",
+    notesTitle: "📝 Nota Laporan / Peringatan", notesPlc: "Tulis nota di sini...",
+    days: ["Isnin", "Selasa", "Rabu", "Khamis", "Jumaat", "Sabtu", "Ahad"],
+    adhocPlc: "Contoh: Sedekah roti, tambah mic...",
+    resetConfirm: "Padam semua checklist, adhoc, dan nota?"
+  },
+  en: {
+    title: "Mosque Maintenance Procedure", subtitle: "Daily Routine · 4.30 am – 9.00 am",
+    expand: "Expand All", edit: "✏️ Edit", save: "💾 Save", reset: "Reset",
+    progress: "done", adhocTitle: "📌 Adhoc Tasks (Weekly)",
+    notesTitle: "📝 Notes / Reminders", notesPlc: "Write notes here...",
+    days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+    adhocPlc: "E.g: Bread donation, extra mic...",
+    resetConfirm: "Clear all checklists, adhoc, and notes?"
+  }
+};
+
+let currentLang = localStorage.getItem("noja_lang") || "ms";
+let isEditMode = false;
+
+// --- DATA DEFAULT ---
+const defaultData = [
+  {
+    time: "4.30 – 4.45",
+    title: { ms: "Persiapan Awal & Keselamatan", en: "Early Prep & Safety" },
+    tasks: [
+      { t: { ms: "Buka pintu utama & nyalakan lampu", en: "Open main doors & turn on lights" }, n: { ms: "Pastikan tiada orang mencurigakan", en: "Ensure no suspicious people" } },
+      { t: { ms: "Semak suis utama (DB)", en: "Check main switch (DB)" }, n: { ms: "Jangan sentuh jika ada tanda bahaya", en: "Do not touch if danger signs" }, d: true },
+      { t: { ms: "Buka tingkap / aktifkan kipas", en: "Open windows / turn on fans" } },
+      { t: { ms: "Semak kebersihan luar", en: "Check outside cleanliness" } }
+    ]
+  },
+  {
+    time: "4.45 – 5.00",
+    title: { ms: "Persiapan Solat Subuh", en: "Subuh Prayer Prep" },
+    tasks: [
+      { t: { ms: "Pasang PA system & mikrofon", en: "Set up PA system & microphone" }, n: { ms: "Uji mic imam & bilal", en: "Test imam & bilal mic" } },
+      { t: { ms: "Semak arah kiblat & saf", en: "Check qiblah & saf" } },
+      { t: { ms: "Isi air minuman", en: "Fill drinking water" } },
+      { t: { ms: "Pastikan jam masjid tepat", en: "Ensure mosque clock is accurate" } }
+    ]
+  },
+  {
+    time: "5.00 – 5.30",
+    title: { ms: "Solat Subuh & Tugas Semasa", en: "Subuh Prayer & Duties" },
+    tasks: [
+      { t: { ms: "Pastikan pendingin hawa / kipas berfungsi", en: "Ensure AC / fans are working" } },
+      { t: { ms: "Kawal laluan & kasut tersusun", en: "Manage walkway & shoes are tidy" } },
+      { t: { ms: "Perhati keperluan jemaah", en: "Attend to jemaah needs" } }
+    ]
+  },
+  {
+    time: "5.30 – 6.30",
+    title: { ms: "Pembersihan Utama", en: "Main Cleaning" },
+    tasks: [
+      { t: { ms: "Sapu & mop ruang solat utama", en: "Sweep & mop main prayer hall" }, n: { ms: "Guna mop lembap", en: "Use damp mop" } },
+      { t: { ms: "Bersihkan tandas & tempat wuduk", en: "Clean toilets & ablution area" }, n: { ms: "Semak sabun, tisu", en: "Check soap, tissue" } },
+      { t: { ms: "Kosongkan tong sampah", en: "Empty trash bins" } },
+      { t: { ms: "Lap meja, rak Al-Quran, mimbar", en: "Wipe tables, Quran racks, mimbar" } },
+      { t: { ms: "Semak & isi air dispenser", en: "Check & refill water dispenser" } }
+    ]
+  },
+  {
+    time: "6.30 – 7.30",
+    title: { ms: "Penyelenggaraan & Semakan", en: "Maintenance & Checking" },
+    tasks: [
+      { t: { ms: "Semak lampu rosak", en: "Check for broken lights" } },
+      { t: { ms: "Semak paip bocor / sinki", en: "Check for leaking pipes / sinks" }, n: { ms: "Lapor segera jika perlu", en: "Report immediately if needed" }, d: true },
+      { t: { ms: "Semak penghawa dingin", en: "Check air conditioning" } },
+      { t: { ms: "Semak pagar & kunci pintu", en: "Check fences & door locks" } }
+    ]
+  },
+  {
+    time: "7.30 – 8.30",
+    title: { ms: "Persiapan Aktiviti / Kelas", en: "Activity / Class Prep" },
+    tasks: [
+      { t: { ms: "Susun kerusi / meja", en: "Arrange chairs / tables" } },
+      { t: { ms: "Pastikan PA & projektor berfungsi", en: "Ensure PA & projector work" } },
+      { t: { ms: "Sediakan air minuman", en: "Prepare drinking water" } },
+      { t: { ms: "Semak papan notis", en: "Check notice board" } }
+    ]
+  },
+  {
+    time: "8.30 – 9.00",
+    title: { ms: "Penutup Syif & Laporan", en: "Shift End & Report" },
+    tasks: [
+      { t: { ms: "Kemas semula ruang selepas aktiviti", en: "Tidy up space after activity" } },
+      { t: { ms: "Semak semula tandas & tempat wuduk", en: "Re-check toilets & ablution area" } },
+      { t: { ms: "Matikan lampu / kipas tidak perlu", en: "Turn off unused lights / fans" } },
+      { t: { ms: "Catat dalam buku log", en: "Log in the book" }, n: { ms: "Sertakan masa & tindakan", en: "Include time & action" } }
+    ]
+  }
+];
+
+// --- STORAGE KEYS ---
+const K_TASKS = "noja_tasks_v2";
+const K_CHECKS = "noja_checks_v2";
+const K_ADHOC = "noja_adhoc_v2";
+const K_NOTES = "noja_notes_v2";
+
+let tasksData = JSON.parse(localStorage.getItem(K_TASKS)) || defaultData;
+let checksData = JSON.parse(localStorage.getItem(K_CHECKS)) || {};
+let adhocData = JSON.parse(localStorage.getItem(K_ADHOC)) || {};
+let notesData = localStorage.getItem(K_NOTES) || "";
+
+// --- RENDER FUNCTIONS ---
+function renderTexts() {
+  const t = i18n[currentLang];
+  document.getElementById("title").textContent = t.title;
+  document.getElementById("subtitle").textContent = t.subtitle;
+  document.getElementById("langBtn").textContent = currentLang === "ms" ? "🇬🇧 EN" : "🇲🇾 MS";
+  document.getElementById("btnExpand").textContent = t.expand;
+  document.getElementById("btnEdit").textContent = isEditMode ? t.save : t.edit;
+  document.getElementById("btnReset").textContent = t.reset;
+  document.getElementById("adhocTitle").textContent = t.adhocTitle;
+  document.getElementById("notesTitle").textContent = t.notesTitle;
+  document.getElementById("mainNotes").placeholder = t.notesPlc;
+  
+  document.getElementById("progressText").textContent = 
+    `${Object.values(checksData).filter(Boolean).length} / ${countAllTasks()} ${t.progress}`;
+}
+
+function countAllTasks() {
+  return tasksData.reduce((acc, sec) => acc + sec.tasks.length, 0);
+}
+
+function renderTasks() {
+  const container = document.getElementById("sections");
+  container.innerHTML = "";
+  
+  tasksData.forEach((sec, si) => {
+    const div = document.createElement("div");
+    div.className = "section";
+    div.id = "sec" + si;
+
+    const head = document.createElement("div");
+    head.className = "section-head";
+    head.innerHTML = `
+      <span class="time">${sec.time}</span>
+      <h2>${sec.title[currentLang]}</h2>
+      <span class="badge-done">DONE</span>
+      <span class="arrow">▶</span>`;
+    if (!isEditMode) head.onclick = () => div.classList.toggle("open");
+    div.appendChild(head);
+
+    const body = document.createElement("div");
+    body.className = "section-body";
+
+    sec.tasks.forEach((task, ti) => {
+      const key = `s${si}_t${ti}`;
+      const wrap = document.createElement("div");
+      wrap.className = "task";
+
+      if (isEditMode) {
+        // Edit Mode UI
+        wrap.style.flexDirection = "column";
+        wrap.innerHTML = `
+          <input type="text" class="edit-input" value="${task.t[currentLang]}" 
+            onchange="updateTaskText(${si}, ${ti}, this.value)">
+          ${task.n ? `<input type="text" class="edit-input" style="margin-top:4px; font-size:0.8rem;" value="${task.n[currentLang]}" 
+            onchange="updateTaskNote(${si}, ${ti}, this.value)">` : ''}
+          <button class="btn-delete" onclick="deleteTask(${si}, ${ti})" style="margin-top:8px; align-self:flex-start;">Delete</button>
+        `;
+      } else {
+        // View Mode UI
+        const cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.id = key;
+        cb.checked = !!checksData[key];
+        cb.onchange = () => {
+          checksData[key] = cb.checked;
+          localStorage.setItem(K_CHECKS, JSON.stringify(checksData));
+          updateProgress();
+        };
+
+        const lbl = document.createElement("label");
+        lbl.htmlFor = key;
+        lbl.innerHTML = task.t[currentLang] +
+          (task.n ? `<span class="note ${task.d ? 'danger-note':''}">⚠ ${task.n[currentLang]}</span>` : "");
+
+        wrap.appendChild(cb);
+        wrap.appendChild(lbl);
+      }
+      body.appendChild(wrap);
+    });
+
+    div.appendChild(body);
+    container.appendChild(div);
+  });
+  
+  // Update progress bar
+  updateProgress();
+}
+
+function renderAdhoc() {
+  const grid = document.getElementById("adhocGrid");
+  grid.innerHTML = "";
+  const days = i18n[currentLang].days;
+  
+  for (let i = 0; i < 7; i++) {
+    const card = document.createElement("div");
+    card.className = "adhoc-card";
+    card.innerHTML = `
+      <h4>${days[i]}</h4>
+      <textarea class="adhoc-textarea" id="adhoc_${i}" 
+        placeholder="${i18n[currentLang].adhocPlc}"
+        oninput="saveAdhoc(${i}, this.value)">${adhocData[i] || ""}</textarea>
+    `;
+    grid.appendChild(card);
+  }
+}
+
+function updateProgress() {
+  const all = countAllTasks();
+  const done = Object.values(checksData).filter(Boolean).length;
+  const pct = all ? (done / all * 100) : 0;
+  
+  document.getElementById("fill").style.width = pct + "%";
+  document.getElementById("progressText").textContent = 
+    `${done} / ${all} ${i18n[currentLang].progress} (${Math.round(pct)}%)`;
+
+  tasksData.forEach((sec, si) => {
+    const boxes = sec.tasks.map((_, ti) => checksData[`s${si}_t${ti}`]);
+    const allDone = boxes.length > 0 && boxes.every(b => b === true);
+    const el = document.getElementById("sec" + si);
+    if (el) el.classList.toggle("complete", allDone);
+  });
+}
+
+// --- ACTIONS ---
+function toggleLang() {
+  currentLang = currentLang === "ms" ? "en" : "ms";
+  localStorage.setItem("noja_lang", currentLang);
+  renderTexts();
+  renderTasks();
+  renderAdhoc();
+}
+
+function toggleEditMode() {
+  isEditMode = !isEditMode;
+  renderTexts();
+  renderTasks();
+  if (!isEditMode) {
+    localStorage.setItem(K_TASKS, JSON.stringify(tasksData));
+  }
+}
+
+function updateTaskText(si, ti, val) {
+  tasksData[si].tasks[ti].t[currentLang] = val;
+}
+
+function updateTaskNote(si, ti, val) {
+  if(tasksData[si].tasks[ti].n) {
+    tasksData[si].tasks[ti].n[currentLang] = val;
+  } else {
+    tasksData[si].tasks[ti].n = { ms: val, en: val };
+  }
+}
+
+function deleteTask(si, ti) {
+  if(confirm("Delete this task? / Padam tugasan ini?")) {
+    tasksData[si].tasks.splice(ti, 1);
+    renderTasks();
+    localStorage.setItem(K_TASKS, JSON.stringify(tasksData));
+  }
+}
+
+function saveAdhoc(index, val) {
+  adhocData[index] = val;
+  localStorage.setItem(K_ADHOC, JSON.stringify(adhocData));
+}
+
+document.getElementById("mainNotes").addEventListener("input", (e) => {
+  localStorage.setItem(K_NOTES, e.target.value);
+});
+
+function resetAll() {
+  if (confirm(i18n[currentLang].resetConfirm)) {
+    checksData = {};
+    adhocData = {};
+    notesData = "";
+    localStorage.removeItem(K_CHECKS);
+    localStorage.removeItem(K_ADHOC);
+    localStorage.removeItem(K_NOTES);
+    document.getElementById("mainNotes").value = "";
+    renderTasks();
+    renderAdhoc();
+    document.querySelectorAll(".task input[type=checkbox]").forEach(c => c.checked = false);
+  }
+}
+
+function expandAll() {
+  document.querySelectorAll(".section").forEach(s => s.classList.toggle("open"));
+}
+
+// --- CLOCK & DATE ---
+function tick() {
+  const now = new Date();
+  const langCode = currentLang === "ms" ? "ms-MY" : "en-GB";
+  
+  // Format: Monday, 24 Oct 2026
+  const dateStr = now.toLocaleDateString(langCode, { 
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+  });
+  
+  document.getElementById("dateDisplay").textContent = dateStr;
+  document.getElementById("clock").textContent = now.toLocaleTimeString(langCode, { hour12: false });
+}
+setInterval(tick, 1000);
+
+// --- INIT ---
+function init() {
+  document.getElementById("mainNotes").value = notesData;
+  renderTexts();
+  renderTasks();
+  renderAdhoc();
+  tick();
+  document.getElementById("sec0").classList.add("open");
+}
+
+init();
+</script>
+</body>
+</html>
