@@ -26,7 +26,7 @@
     font-size: 0.8rem; cursor: pointer; width: auto; 
   }
   .btn-lang { background: var(--accent2); color: #0f172a; }
-  .btn-gallery { background: #8b5cf6; color: white; } /* Warna ungu untuk Galeri */
+  .btn-gallery { background: #8b5cf6; color: white; }
   
   header {
     text-align: center; margin-bottom: 20px; padding: 16px;
@@ -67,7 +67,7 @@
   .task input:checked + label { color: var(--muted); text-decoration: line-through; }
   .note { font-size: 0.8rem; color: var(--warn); margin-top: 4px; display: block; }
 
-  /* Edit Mode Inputs */
+  /* Edit Mode */
   .edit-input { width: 100%; padding: 8px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text); border-radius: 6px; font-family: inherit; margin-bottom: 4px; }
   .btn-sm { padding: 6px 10px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; border: none; font-weight: bold; }
   .btn-delete { background: var(--danger); color: white; margin-left: 8px; }
@@ -94,14 +94,14 @@
   .badge-done { font-size: 0.7rem; background: var(--accent); color: #0f172a; padding: 2px 6px; border-radius: 5px; font-weight: 700; display: none; }
   .section.complete .badge-done { display: inline-block; }
 
-  /* MODAL (Galeri & Gambar) */
+  /* MODAL */
   .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; flex-direction: column; }
   .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 16px; background: var(--card); border-bottom: 1px solid var(--border); }
   .modal-header h2 { margin: 0; font-size: 1.2rem; }
   .modal-body { padding: 16px; overflow-y: auto; flex: 1; }
   .btn-close { background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
   
-  /* Galeri Gambar Grid */
+  /* Gallery Grid */
   .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
   .gallery-item { background: var(--card); border-radius: 10px; overflow: hidden; border: 1px solid var(--border); display: flex; flex-direction: column; }
   .gallery-item img { width: 100%; height: 120px; object-fit: cover; cursor: pointer; }
@@ -110,7 +110,7 @@
   .gallery-item-actions { display: flex; gap: 6px; }
   .gallery-item-actions button { flex: 1; font-size: 0.7rem; padding: 4px; }
 
-  /* Print Styles */
+  /* Print */
   @media print {
     body { background: white; color: black; padding: 0; }
     header, .progress-wrap, footer, .top-bar, .adhoc-section, .notes-section, .btn-sm, .btn-delete, .btn-add, .btn-del-sec, .arrow { display: none !important; }
@@ -129,10 +129,10 @@
 <div class="top-bar">
   <div style="font-weight: bold; font-size: 1.1rem;">🕌 Noja Masjid</div>
   <div class="btn-group">
-    <button class="btn-tool btn-gallery" onclick="openGallery()">📸 Galeri Rujukan</button>
-    <button class="btn-tool" onclick="backupJSON()" title="Backup">📥 Backup</button>
-    <button class="btn-tool" onclick="document.getElementById('restoreFile').click()" title="Restore">📤 Restore</button>
-    <button class="btn-tool" onclick="window.print()" title="Print PDF">🖨️ Print</button>
+    <button class="btn-tool btn-gallery" id="btnGallery" onclick="openGallery()">📸 Galeri Rujukan</button>
+    <button class="btn-tool" id="btnBackup" onclick="backupJSON()" title="Backup">📥 Backup</button>
+    <button class="btn-tool" id="btnRestore" onclick="document.getElementById('restoreFile').click()" title="Restore">📤 Restore</button>
+    <button class="btn-tool" id="btnPrint" onclick="window.print()" title="Print PDF">🖨️ Print</button>
     <button class="btn-lang" id="langBtn" onclick="toggleLang()">EN</button>
   </div>
   <input type="file" id="restoreFile" accept=".json" style="display:none" onchange="restoreJSON(this)">
@@ -168,25 +168,27 @@
   <button class="main-btn btn-danger" id="btnReset" onclick="resetAll()">Reset</button>
 </footer>
 
-<!-- Modal Galeri Rujukan -->
+<!-- Gallery Modal -->
 <div id="galleryModal" class="modal">
   <div class="modal-header">
-    <h2>📸 Galeri Rujukan</h2>
-    <button class="btn-close" onclick="closeGallery()">Tutup</button>
+    <h2 id="galleryTitle">📸 Galeri Rujukan</h2>
+    <button class="btn-close" id="btnCloseGallery" onclick="closeGallery()">Tutup</button>
   </div>
   <div class="modal-body">
-    <button class="btn-tool btn-primary" style="width: 100%; margin-bottom: 16px; padding: 12px; font-size: 1rem;" onclick="triggerGalleryUpload()">+ Tambah Gambar Baru</button>
+    <button class="btn-tool btn-primary" id="btnAddGallery" style="width: 100%; margin-bottom: 16px; padding: 12px; font-size: 1rem;" onclick="triggerGalleryUpload()">+ Tambah Gambar Baru</button>
     <div class="gallery-grid" id="galleryGrid"></div>
   </div>
 </div>
 
-<!-- Modal Full Image Viewer -->
+<!-- Full Image Viewer -->
 <div id="imgModal" class="modal" style="justify-content: center; align-items: center; background: rgba(0,0,0,0.95);" onclick="if(event.target===this) this.style.display='none'">
   <img id="imgModalSrc" style="max-width: 100%; max-height: 100%; object-fit: contain;">
 </div>
 
 <script>
-// --- TRANSLATIONS ---
+// ==========================================
+// TRANSLATIONS (LANGUAGE DICTIONARY)
+// ==========================================
 const i18n = {
   ms: {
     title: "Prosedur Kerja Noja Masjid", subtitle: "Rutin Harian · 4.30 pagi – 9.00 pagi",
@@ -197,7 +199,17 @@ const i18n = {
     adhocPlc: "Contoh: Sedekah roti, tambah mic...",
     resetConfirm: "Padam semua checklist, adhoc, dan nota?",
     addTask: "+ Tambah Tugasan", delTask: "Padam", delSec: "Padam Kotak",
-    addSec: "+ Tambah Kotak Baru", 
+    addSec: "+ Tambah Kotak Baru",
+    backupBtn: "📥 Backup", restoreBtn: "📤 Restore", printBtn: "🖨️ Print",
+    galleryBtn: "📸 Galeri Rujukan", galleryTitle: "📸 Galeri Rujukan",
+    addImgBtn: "+ Tambah Gambar Baru", closeBtn: "Tutup",
+    editImgBtn: "Edit", delImgBtn: "Padam",
+    noImgText: "Tiada gambar lagi. Tekan butang di atas untuk tambah.",
+    promptTitle: "Masukkan tajuk/keterangan gambar (contoh: Panel Aircon Daikin):",
+    promptEditTitle: "Edit tajuk gambar:",
+    confirmDelImg: "Padam gambar ini dari galeri?",
+    confirmDelTask: "Padam tugasan ini?",
+    confirmDelSec: "Padam kotak ini?",
     backupDone: "Backup berjaya dimuat turun!", restoreSuccess: "Data berjaya dipulihkan! Sila refresh page.", restoreError: "Fail tidak sah."
   },
   en: {
@@ -209,15 +221,27 @@ const i18n = {
     adhocPlc: "E.g: Bread donation, extra mic...",
     resetConfirm: "Clear all checklists, adhoc, and notes?",
     addTask: "+ Add Task", delTask: "Delete", delSec: "Delete Box",
-    addSec: "+ Add New Box", 
+    addSec: "+ Add New Box",
+    backupBtn: "📥 Backup", restoreBtn: "📤 Restore", printBtn: "🖨️ Print",
+    galleryBtn: "📸 Ref Gallery", galleryTitle: "📸 Reference Gallery",
+    addImgBtn: "+ Add New Image", closeBtn: "Close",
+    editImgBtn: "Edit", delImgBtn: "Delete",
+    noImgText: "No images yet. Click the button above to add.",
+    promptTitle: "Enter image title/description (e.g: Daikin Aircon Panel):",
+    promptEditTitle: "Edit image title:",
+    confirmDelImg: "Delete this image from gallery?",
+    confirmDelTask: "Delete this task?",
+    confirmDelSec: "Delete this box?",
     backupDone: "Backup downloaded successfully!", restoreSuccess: "Data restored! Please refresh page.", restoreError: "Invalid file."
   }
 };
 
+// ==========================================
+// STATE & VARIABLES
+// ==========================================
 let currentLang = localStorage.getItem("noja_lang") || "ms";
 let isEditMode = false;
 
-// --- DATA DEFAULT ---
 const defaultData = [
   {
     time: "4.30 – 4.45",
@@ -291,12 +315,12 @@ const defaultData = [
   }
 ];
 
-// --- STORAGE KEYS ---
-const K_TASKS = "noja_tasks_v4";
-const K_CHECKS = "noja_checks_v4";
-const K_ADHOC = "noja_adhoc_v4";
-const K_NOTES = "noja_notes_v4";
-const K_GALLERY = "noja_gallery_v4"; // Array of { id, title, base64 }
+// Storage Keys
+const K_TASKS = "noja_tasks_v5";
+const K_CHECKS = "noja_checks_v5";
+const K_ADHOC = "noja_adhoc_v5";
+const K_NOTES = "noja_notes_v5";
+const K_GALLERY = "noja_gallery_v5";
 
 let tasksData = JSON.parse(localStorage.getItem(K_TASKS)) || defaultData;
 let checksData = JSON.parse(localStorage.getItem(K_CHECKS)) || {};
@@ -304,21 +328,37 @@ let adhocData = JSON.parse(localStorage.getItem(K_ADHOC)) || {};
 let notesData = localStorage.getItem(K_NOTES) || "";
 let galleryData = JSON.parse(localStorage.getItem(K_GALLERY)) || [];
 
-// --- RENDER ---
+// ==========================================
+// RENDER FUNCTIONS (UI UPDATES)
+// ==========================================
 function renderTexts() {
   const t = i18n[currentLang];
+  
+  // Top Bar & Header
   document.getElementById("title").textContent = t.title;
   document.getElementById("subtitle").textContent = t.subtitle;
   document.getElementById("langBtn").textContent = currentLang === "ms" ? "EN" : "BM";
+  
+  // Buttons
+  document.getElementById("btnGallery").textContent = t.galleryBtn;
+  document.getElementById("btnBackup").textContent = t.backupBtn;
+  document.getElementById("btnRestore").textContent = t.restoreBtn;
+  document.getElementById("btnPrint").textContent = t.printBtn;
   document.getElementById("btnExpand").textContent = t.expand;
   document.getElementById("btnEdit").textContent = isEditMode ? t.save : t.edit;
   document.getElementById("btnReset").textContent = t.reset;
+  
+  // Sections
   document.getElementById("adhocTitle").textContent = t.adhocTitle;
   document.getElementById("notesTitle").textContent = t.notesTitle;
   document.getElementById("mainNotes").placeholder = t.notesPlc;
   
-  document.getElementById("progressText").textContent = 
-    `${Object.values(checksData).filter(Boolean).length} / ${countAllTasks()} ${t.progress}`;
+  // Gallery Modal
+  document.getElementById("galleryTitle").textContent = t.galleryTitle;
+  document.getElementById("btnCloseGallery").textContent = t.closeBtn;
+  document.getElementById("btnAddGallery").textContent = t.addImgBtn;
+  
+  updateProgress();
 }
 
 function countAllTasks() {
@@ -363,7 +403,7 @@ function renderTasks() {
             onchange="updateTaskText(${si}, ${ti}, this.value)">
           <div style="display:flex; width:100%; gap:8px; align-items:center;">
              <input type="text" class="edit-input" style="flex:1; margin-bottom:0; font-size:0.8rem;" 
-                placeholder="Nota (optional)" value="${task.n ? task.n[currentLang] : ''}" 
+                placeholder="Notes / Nota" value="${task.n ? task.n[currentLang] : ''}" 
                 onchange="updateTaskNote(${si}, ${ti}, this.value)">
              <button class="btn-sm btn-delete" onclick="deleteTask(${si}, ${ti})">${t.delTask}</button>
           </div>
@@ -432,7 +472,26 @@ function renderAdhoc() {
   }
 }
 
-// --- GALLERY LOGIC ---
+function updateProgress() {
+  const all = countAllTasks();
+  const done = Object.values(checksData).filter(Boolean).length;
+  const pct = all ? (done / all * 100) : 0;
+  
+  document.getElementById("fill").style.width = pct + "%";
+  document.getElementById("progressText").textContent = 
+    `${done} / ${all} ${i18n[currentLang].progress} (${Math.round(pct)}%)`;
+
+  tasksData.forEach((sec, si) => {
+    const boxes = sec.tasks.map((_, ti) => checksData[`s${si}_t${ti}`]);
+    const allDone = boxes.length > 0 && boxes.every(b => b === true);
+    const el = document.getElementById("sec" + si);
+    if (el) el.classList.toggle("complete", allDone);
+  });
+}
+
+// ==========================================
+// GALLERY LOGIC
+// ==========================================
 function openGallery() {
   document.getElementById("galleryModal").style.display = "flex";
   renderGallery();
@@ -445,16 +504,16 @@ function closeGallery() {
 function renderGallery() {
   const grid = document.getElementById("galleryGrid");
   grid.innerHTML = "";
+  const t = i18n[currentLang];
   
   if (galleryData.length === 0) {
-    grid.innerHTML = "<p style='color:var(--muted); grid-column:1/-1; text-align:center;'>Tiada gambar lagi. Tekan butang di atas untuk tambah.</p>";
+    grid.innerHTML = `<p style='color:var(--muted); grid-column:1/-1; text-align:center;'>${t.noImgText}</p>`;
     return;
   }
   
-  // Susun dari gambar terbaru
   const reversed = [...galleryData].reverse();
   
-  reversed.forEach((item, index) => {
+  reversed.forEach((item) => {
     const card = document.createElement("div");
     card.className = "gallery-item";
     card.innerHTML = `
@@ -462,8 +521,8 @@ function renderGallery() {
       <div class="gallery-item-info">
         <div class="gallery-item-title">${item.title}</div>
         <div class="gallery-item-actions">
-          <button class="btn-sm" style="background:var(--accent2); color:#0f172a;" onclick="editGalleryTitle('${item.id}')">Edit</button>
-          <button class="btn-sm btn-delete" onclick="deleteGalleryImg('${item.id}')">Padam</button>
+          <button class="btn-sm" style="background:var(--accent2); color:#0f172a;" onclick="editGalleryTitle('${item.id}')">${t.editImgBtn}</button>
+          <button class="btn-sm btn-delete" onclick="deleteGalleryImg('${item.id}')">${t.delImgBtn}</button>
         </div>
       </div>
     `;
@@ -472,8 +531,9 @@ function renderGallery() {
 }
 
 function triggerGalleryUpload() {
-  const title = prompt("Masukkan tajuk/keterangan gambar (contoh: Panel Aircon Daikin):");
-  if (!title) return; // Batal jika tiada tajuk
+  const t = i18n[currentLang];
+  const title = prompt(t.promptTitle);
+  if (!title) return;
 
   const input = document.createElement("input");
   input.type = "file";
@@ -488,8 +548,8 @@ function triggerGalleryUpload() {
     reader.onload = (ev) => {
       const img = new Image();
       img.onload = () => {
+        // Resize image to save local storage space
         const canvas = document.createElement("canvas");
-        // Saiz gambar rujukan boleh lebih besar sikit, cth: max width 1000px
         const MAX_WIDTH = 1000; 
         const scale = MAX_WIDTH / img.width;
         canvas.width = MAX_WIDTH;
@@ -497,7 +557,7 @@ function triggerGalleryUpload() {
         const ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         
-        const base64 = canvas.toDataURL("image/jpeg", 0.75); // Kualiti 75%
+        const base64 = canvas.toDataURL("image/jpeg", 0.75);
         
         galleryData.push({
           id: Date.now().toString(),
@@ -526,7 +586,7 @@ function viewImage(id) {
 function editGalleryTitle(id) {
   const item = galleryData.find(g => g.id === id);
   if (!item) return;
-  const newTitle = prompt("Edit tajuk gambar:", item.title);
+  const newTitle = prompt(i18n[currentLang].promptEditTitle, item.title);
   if (newTitle !== null && newTitle.trim() !== "") {
     item.title = newTitle.trim();
     localStorage.setItem(K_GALLERY, JSON.stringify(galleryData));
@@ -535,14 +595,16 @@ function editGalleryTitle(id) {
 }
 
 function deleteGalleryImg(id) {
-  if (confirm("Padam gambar ini dari galeri?")) {
+  if (confirm(i18n[currentLang].confirmDelImg)) {
     galleryData = galleryData.filter(g => g.id !== id);
     localStorage.setItem(K_GALLERY, JSON.stringify(galleryData));
     renderGallery();
   }
 }
 
-// --- ACTIONS ---
+// ==========================================
+// ACTIONS & EDITING
+// ==========================================
 function toggleLang() {
   currentLang = currentLang === "ms" ? "en" : "ms";
   localStorage.setItem("noja_lang", currentLang);
@@ -576,7 +638,7 @@ function updateTaskNote(si, ti, val) {
 }
 
 function deleteTask(si, ti) {
-  if(confirm(i18n[currentLang].delTask + "?")) {
+  if(confirm(i18n[currentLang].confirmDelTask)) {
     tasksData[si].tasks.splice(ti, 1);
     renderTasks();
     localStorage.setItem(K_TASKS, JSON.stringify(tasksData));
@@ -593,7 +655,7 @@ function addTask(si) {
 }
 
 function deleteSection(si) {
-  if(confirm(i18n[currentLang].delSec + "?")) {
+  if(confirm(i18n[currentLang].confirmDelSec)) {
     tasksData.splice(si, 1);
     renderTasks();
     localStorage.setItem(K_TASKS, JSON.stringify(tasksData));
@@ -602,7 +664,7 @@ function deleteSection(si) {
 
 function addSection() {
   tasksData.push({
-    time: "Masa",
+    time: "Time",
     title: { ms: "Kotak Baru", en: "New Box" },
     tasks: [{ t: { ms: "Tugasan Baru", en: "New Task" }, n: { ms: "", en: "" } }]
   });
@@ -638,31 +700,16 @@ function expandAll() {
   document.querySelectorAll(".section").forEach(s => s.classList.toggle("open"));
 }
 
-function updateProgress() {
-  const all = countAllTasks();
-  const done = Object.values(checksData).filter(Boolean).length;
-  const pct = all ? (done / all * 100) : 0;
-  
-  document.getElementById("fill").style.width = pct + "%";
-  document.getElementById("progressText").textContent = 
-    `${done} / ${all} ${i18n[currentLang].progress} (${Math.round(pct)}%)`;
-
-  tasksData.forEach((sec, si) => {
-    const boxes = sec.tasks.map((_, ti) => checksData[`s${si}_t${ti}`]);
-    const allDone = boxes.length > 0 && boxes.every(b => b === true);
-    const el = document.getElementById("sec" + si);
-    if (el) el.classList.toggle("complete", allDone);
-  });
-}
-
-// --- BACKUP & RESTORE ---
+// ==========================================
+// BACKUP & RESTORE DATA
+// ==========================================
 function backupJSON() {
   const backupData = {
     tasks: tasksData,
     checks: checksData,
     adhoc: adhocData,
     notes: notesData,
-    gallery: galleryData // Sertakan galeri gambar
+    gallery: galleryData
   };
   
   const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: "application/json" });
@@ -709,7 +756,9 @@ function restoreJSON(input) {
   input.value = "";
 }
 
-// --- CLOCK ---
+// ==========================================
+// REAL-TIME CLOCK
+// ==========================================
 function tick() {
   const now = new Date();
   const langCode = currentLang === "ms" ? "ms-SG" : "en-SG";
@@ -723,7 +772,9 @@ function tick() {
 }
 setInterval(tick, 1000);
 
-// --- INIT ---
+// ==========================================
+// INITIALIZE APP
+// ==========================================
 function init() {
   document.getElementById("mainNotes").value = notesData;
   renderTexts();
