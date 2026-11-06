@@ -65,8 +65,11 @@
   .note { font-size: 0.8rem; color: var(--warn); margin-top: 4px; display: block; }
 
   /* Edit Mode */
-  .edit-input { width: 100%; padding: 8px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text); border-radius: 6px; font-family: inherit; }
-  .btn-delete { background: var(--danger); color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; margin-left: 8px; }
+  .edit-input { width: 100%; padding: 8px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text); border-radius: 6px; font-family: inherit; margin-bottom: 4px; }
+  .btn-sm { padding: 6px 10px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; border: none; font-weight: bold; }
+  .btn-delete { background: var(--danger); color: white; margin-left: 8px; }
+  .btn-add { background: var(--accent); color: #0f172a; margin-top: 10px; width: 100%; }
+  .btn-del-sec { background: transparent; color: var(--danger); border: 1px solid var(--danger); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; margin-left: auto; }
 
   /* Adhoc Grid */
   .adhoc-section { margin-top: 24px; }
@@ -83,16 +86,15 @@
 
   /* Footer */
   footer { position: fixed; bottom: 0; left: 0; right: 0; background: #0b1220; padding: 12px 16px; display: flex; gap: 10px; border-top: 1px solid var(--border); z-index: 20; flex-wrap: wrap; }
-  button { flex: 1; padding: 12px; border: none; border-radius: 10px; font-weight: 600; font-size: 0.9rem; cursor: pointer; background: var(--border); color: var(--text); transition: 0.2s; }
-  button:active { opacity: 0.8; }
-  .btn-primary { background: var(--accent2); color: #0f172a; }
-  .btn-danger { background: var(--danger); color: white; }
+  button.main-btn { flex: 1; padding: 12px; border: none; border-radius: 10px; font-weight: 600; font-size: 0.9rem; cursor: pointer; background: var(--border); color: var(--text); transition: 0.2s; }
+  button.main-btn:active { opacity: 0.8; }
+  .btn-primary { background: var(--accent2) !important; color: #0f172a !important; }
+  .btn-danger { background: var(--danger) !important; color: white !important; }
   .badge-done { font-size: 0.7rem; background: var(--accent); color: #0f172a; padding: 2px 6px; border-radius: 5px; font-weight: 700; display: none; }
   .section.complete .badge-done { display: inline-block; }
 
   @media (max-width: 600px) {
     .section-head h2 { font-size: 0.9rem; }
-    .btn-delete { padding: 6px; font-size: 0.7rem; }
   }
 </style>
 </head>
@@ -119,7 +121,7 @@
 
 <!-- Adhoc Tasks -->
 <div class="adhoc-section">
-  <h3 id="adhocTitle">📌 Tugasan Adhoc (Mingguan)</h3>
+  <h3 id="adhocTitle">📌 Tugasan Mingguan</h3>
   <div class="adhoc-grid" id="adhocGrid"></div>
 </div>
 
@@ -130,9 +132,9 @@
 </div>
 
 <footer>
-  <button id="btnExpand" onclick="expandAll()">Buka Semua</button>
-  <button id="btnEdit" class="btn-primary" onclick="toggleEditMode()">✏️ Edit</button>
-  <button id="btnReset" class="btn-danger" onclick="resetAll()">Reset</button>
+  <button class="main-btn" id="btnExpand" onclick="expandAll()">Buka Semua</button>
+  <button class="main-btn btn-primary" id="btnEdit" onclick="toggleEditMode()">✏️ Edit</button>
+  <button class="main-btn btn-danger" id="btnReset" onclick="resetAll()">Reset</button>
 </footer>
 
 <script>
@@ -145,7 +147,9 @@ const i18n = {
     notesTitle: "📝 Nota Peribadi", notesPlc: "Tulis nota di sini...",
     days: ["Isnin", "Selasa", "Rabu", "Khamis", "Jumaat", "Sabtu", "Ahad"],
     adhocPlc: "Contoh: Sedekah roti, tambah mic...",
-    resetConfirm: "Padam semua checklist, adhoc, dan nota?"
+    resetConfirm: "Padam semua checklist, adhoc, dan nota?",
+    addTask: "+ Tambah Tugasan", delTask: "Padam", delSec: "Padam Kotak",
+    addSec: "+ Tambah Kotak Baru"
   },
   en: {
     title: "Mosque Maintenance Procedure", subtitle: "Daily Routine · 4.30 am – 9.00 am",
@@ -154,92 +158,94 @@ const i18n = {
     notesTitle: "📝 Personal Notes", notesPlc: "Write notes here...",
     days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
     adhocPlc: "E.g: Bread donation, extra mic...",
-    resetConfirm: "Clear all checklists, adhoc, and notes?"
+    resetConfirm: "Clear all checklists, adhoc, and notes?",
+    addTask: "+ Add Task", delTask: "Delete", delSec: "Delete Box",
+    addSec: "+ Add New Box"
   }
 };
 
 let currentLang = localStorage.getItem("noja_lang") || "ms";
 let isEditMode = false;
 
-// --- DATA (LEMBUT & TANPA ARAHAN KERAS) ---
+// --- DATA ---
 const defaultData = [
   {
     time: "4.30 – 4.45",
-    title: { ms: "Persiapan Awal", en: "Early Prep" },
+    title: { ms: "Buka Kunci & Keselamatan", en: "Unlock & Safety" },
     tasks: [
-      { t: { ms: "Buka pintu utama & nyalakan lampu", en: "Open main doors & turn on lights" }, n: { ms: "Pastikan kawasan selamat", en: "Ensure area is safe" } },
-      { t: { ms: "Semak suis utama (DB)", en: "Check main switch (DB)" } },
+      { t: { ms: "Buka kunci tangga & pintu utama", en: "Unlock stairs & main doors" } },
+      { t: { ms: "On suis utama (DB) & sistem lif", en: "On main switch (DB) & lift system" } },
       { t: { ms: "Buka tingkap / aktifkan kipas", en: "Open windows / turn on fans" } },
       { t: { ms: "Semak kebersihan luar", en: "Check outside cleanliness" } }
     ]
   },
   {
     time: "4.45 – 5.00",
-    title: { ms: "Persiapan Subuh", en: "Subuh Prep" },
+    title: { ms: "Persiapan Subuh & Live", en: "Subuh Prep & Live" },
     tasks: [
-      { t: { ms: "Pasang PA system & mikrofon", en: "Set up PA system & microphone" }, n: { ms: "Uji mic imam", en: "Test imam mic" } },
-      { t: { ms: "Semak arah kiblat & saf", en: "Check qiblah & saf" } },
-      { t: { ms: "Isi air minuman", en: "Fill drinking water" } },
-      { t: { ms: "Pastikan jam masjid tepat", en: "Ensure mosque clock is accurate" } }
+      { t: { ms: "Pasang PA system & mikrofon", en: "Set up PA system & microphone" } },
+      { t: { ms: "On sistem Sound & Aircon (Daikin/Mitsubishi)", en: "On Sound & Aircon systems (Daikin/Mitsubishi)" } },
+      { t: { ms: "Setup Live Streaming (Facebook & OBS)", en: "Setup Live Streaming (Facebook & OBS)" } },
+      { t: { ms: "Semak arah kiblat & saf", en: "Check qiblat & saf" } }
     ]
   },
   {
     time: "5.00 – 5.30",
     title: { ms: "Semasa Solat Subuh", en: "During Subuh" },
     tasks: [
-      { t: { ms: "Pastikan kipas / hawa dingin berfungsi", en: "Ensure fans / AC are working" } },
+      { t: { ms: "Pastikan Live Streaming berjalan lancar", en: "Ensure Live Streaming is smooth" } },
       { t: { ms: "Kemas kasut di rak", en: "Tidy shoes on rack" } },
       { t: { ms: "Lihat keperluan jemaah", en: "Attend to jemaah needs" } }
     ]
   },
   {
     time: "5.30 – 6.30",
-    title: { ms: "Pembersihan", en: "Cleaning" },
+    title: { ms: "Pembersihan & Karpet PMD", en: "Cleaning & PMD Carpet" },
     tasks: [
-      { t: { ms: "Sapu & mop ruang solat", en: "Sweep & mop prayer hall" }, n: { ms: "Guna mop lembap", en: "Use damp mop" } },
+      { t: { ms: "Sapu & mop ruang solat", en: "Sweep & mop prayer hall" } },
+      { t: { ms: "Kemas karpet tempat PMD (elak jemaah tersadung)", en: "Tidy PMD carpet area (prevent tripping)" } },
       { t: { ms: "Bersihkan tandas & tempat wuduk", en: "Clean toilets & ablution area" } },
-      { t: { ms: "Kosongkan tong sampah", en: "Empty trash bins" } },
-      { t: { ms: "Lap meja & rak Al-Quran", en: "Wipe tables & Quran racks" } },
-      { t: { ms: "Isi air dispenser", en: "Refill water dispenser" } }
+      { t: { ms: "Kosongkan tong sampah", en: "Empty trash bins" } }
     ]
   },
   {
     time: "6.30 – 7.30",
-    title: { ms: "Semakan Ringkas", en: "Quick Check" },
+    title: { ms: "Semakan & QR Clocking", en: "Checking & QR Clocking" },
     tasks: [
-      { t: { ms: "Semak lampu rosak", en: "Check for broken lights" } },
-      { t: { ms: "Semak paip / sinki", en: "Check pipes / sinks" } },
-      { t: { ms: "Semak penghawa dingin", en: "Check air conditioning" } },
-      { t: { ms: "Semak pagar & kunci", en: "Check fences & locks" } }
+      { t: { ms: "Scan QR Code di 11 lokasi masjid", en: "Scan QR Code at 11 mosque locations" } },
+      { t: { ms: "Periksa panel Aircon (Daikin/Mitsubishi)", en: "Check Aircon panels (Daikin/Mitsubishi)" } },
+      { t: { ms: "Periksa panel Sound System", en: "Check Sound System panel" } },
+      { t: { ms: "Semak lampu rosak & paip bocor", en: "Check broken lights & leaks" } }
     ]
   },
   {
     time: "7.30 – 8.30",
-    title: { ms: "Persiapan Aktiviti", en: "Activity Prep" },
+    title: { ms: "Persiapan Aktiviti / Kelas", en: "Activity / Class Prep" },
     tasks: [
-      { t: { ms: "Susun kerusi / meja", en: "Arrange chairs / tables" } },
+      { t: { ms: "Sediakan tabung-tabung kuliah ikut label", en: "Prepare donation boxes per label" } },
+      { t: { ms: "Susun kerusi / meja kelas", en: "Arrange class chairs / tables" } },
       { t: { ms: "Pastikan PA & projektor berfungsi", en: "Ensure PA & projector work" } },
-      { t: { ms: "Sediakan air minuman", en: "Prepare drinking water" } },
-      { t: { ms: "Semak papan notis", en: "Check notice board" } }
+      { t: { ms: "Sediakan air minuman", en: "Prepare drinking water" } }
     ]
   },
   {
     time: "8.30 – 9.00",
-    title: { ms: "Tutup Syif", en: "End Shift" },
+    title: { ms: "Tutup Syif & Laporan", en: "End Shift & Report" },
     tasks: [
-      { t: { ms: "Kemas ruang selepas aktiviti", en: "Tidy up space after activity" } },
-      { t: { ms: "Semak tandas & tempat wuduk", en: "Check toilets & ablution area" } },
-      { t: { ms: "Matikan lampu / kipas", en: "Turn off lights / fans" } },
-      { t: { ms: "Catat dalam buku log", en: "Log in the book" }, n: { ms: "Sertakan masa & tindakan", en: "Include time & action" } }
+      { t: { ms: "Off sistem Sound & Aircon", en: "Off Sound & Aircon systems" } },
+      { t: { ms: "Off Live Streaming (OBS)", en: "Off Live Streaming (OBS)" } },
+      { t: { ms: "Off sistem Lif (jika on duty)", en: "Off Lift system (if on duty)" } },
+      { t: { ms: "Kunci semula tangga & pintu", en: "Lock stairs & doors again" } },
+      { t: { ms: "Catat dalam buku log", en: "Log in the book" } }
     ]
   }
 ];
 
 // --- STORAGE KEYS ---
-const K_TASKS = "noja_tasks_v2";
-const K_CHECKS = "noja_checks_v2";
-const K_ADHOC = "noja_adhoc_v2";
-const K_NOTES = "noja_notes_v2";
+const K_TASKS = "noja_tasks_v3";
+const K_CHECKS = "noja_checks_v3";
+const K_ADHOC = "noja_adhoc_v3";
+const K_NOTES = "noja_notes_v3";
 
 let tasksData = JSON.parse(localStorage.getItem(K_TASKS)) || defaultData;
 let checksData = JSON.parse(localStorage.getItem(K_CHECKS)) || {};
@@ -270,6 +276,7 @@ function countAllTasks() {
 function renderTasks() {
   const container = document.getElementById("sections");
   container.innerHTML = "";
+  const t = i18n[currentLang];
   
   tasksData.forEach((sec, si) => {
     const div = document.createElement("div");
@@ -278,32 +285,42 @@ function renderTasks() {
 
     const head = document.createElement("div");
     head.className = "section-head";
+    
+    // Header dengan butang Delete Section (hanya di Edit Mode)
     head.innerHTML = `
       <span class="time">${sec.time}</span>
       <h2>${sec.title[currentLang]}</h2>
       <span class="badge-done">DONE</span>
+      ${isEditMode ? `<button class="btn-sm btn-del-sec" onclick="deleteSection(${si})">${t.delSec}</button>` : ''}
       <span class="arrow">▶</span>`;
+      
     if (!isEditMode) head.onclick = () => div.classList.toggle("open");
     div.appendChild(head);
 
     const body = document.createElement("div");
     body.className = "section-body";
 
+    // Render Tugasan
     sec.tasks.forEach((task, ti) => {
       const key = `s${si}_t${ti}`;
       const wrap = document.createElement("div");
       wrap.className = "task";
 
       if (isEditMode) {
+        // Mod Edit: Input teks & butang padam
         wrap.style.flexDirection = "column";
         wrap.innerHTML = `
           <input type="text" class="edit-input" value="${task.t[currentLang]}" 
             onchange="updateTaskText(${si}, ${ti}, this.value)">
-          ${task.n ? `<input type="text" class="edit-input" style="margin-top:4px; font-size:0.8rem;" value="${task.n[currentLang]}" 
-            onchange="updateTaskNote(${si}, ${ti}, this.value)">` : ''}
-          <button class="btn-delete" onclick="deleteTask(${si}, ${ti})" style="margin-top:8px; align-self:flex-start;">Delete</button>
+          <div style="display:flex; width:100%; gap:8px; align-items:center;">
+             <input type="text" class="edit-input" style="flex:1; margin-bottom:0; font-size:0.8rem;" 
+                placeholder="Nota (optional)" value="${task.n ? task.n[currentLang] : ''}" 
+                onchange="updateTaskNote(${si}, ${ti}, this.value)">
+             <button class="btn-sm btn-delete" onclick="deleteTask(${si}, ${ti})">${t.delTask}</button>
+          </div>
         `;
       } else {
+        // Mod View: Checkbox
         const cb = document.createElement("input");
         cb.type = "checkbox";
         cb.id = key;
@@ -325,9 +342,28 @@ function renderTasks() {
       body.appendChild(wrap);
     });
 
+    // Butang Tambah Tugasan (hanya di Edit Mode)
+    if (isEditMode) {
+      const addBtn = document.createElement("button");
+      addBtn.className = "btn-sm btn-add";
+      addBtn.textContent = t.addTask;
+      addBtn.onclick = () => addTask(si);
+      body.appendChild(addBtn);
+    }
+
     div.appendChild(body);
     container.appendChild(div);
   });
+  
+  // Butang Tambah Kotak Baru (Section) di bawah sekali (jika Edit Mode)
+  if (isEditMode) {
+    const addSecBtn = document.createElement("button");
+    addSecBtn.className = "main-btn btn-primary";
+    addSecBtn.style = "width:100%; margin-bottom:20px;";
+    addSecBtn.textContent = t.addSec;
+    addSecBtn.onclick = addSection;
+    container.appendChild(addSecBtn);
+  }
   
   updateProgress();
 }
@@ -398,11 +434,38 @@ function updateTaskNote(si, ti, val) {
 }
 
 function deleteTask(si, ti) {
-  if(confirm("Delete this task? / Padam tugasan ini?")) {
+  if(confirm(i18n[currentLang].delTask + "?")) {
     tasksData[si].tasks.splice(ti, 1);
     renderTasks();
     localStorage.setItem(K_TASKS, JSON.stringify(tasksData));
   }
+}
+
+function addTask(si) {
+  tasksData[si].tasks.push({
+    t: { ms: "Tugasan Baru", en: "New Task" },
+    n: { ms: "", en: "" }
+  });
+  renderTasks();
+  localStorage.setItem(K_TASKS, JSON.stringify(tasksData));
+}
+
+function deleteSection(si) {
+  if(confirm(i18n[currentLang].delSec + "?")) {
+    tasksData.splice(si, 1);
+    renderTasks();
+    localStorage.setItem(K_TASKS, JSON.stringify(tasksData));
+  }
+}
+
+function addSection() {
+  tasksData.push({
+    time: "Masa",
+    title: { ms: "Kotak Baru", en: "New Box" },
+    tasks: [{ t: { ms: "Tugasan Baru", en: "New Task" }, n: { ms: "", en: "" } }]
+  });
+  renderTasks();
+  localStorage.setItem(K_TASKS, JSON.stringify(tasksData));
 }
 
 function saveAdhoc(index, val) {
