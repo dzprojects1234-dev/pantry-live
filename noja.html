@@ -869,7 +869,7 @@ function saveTasksToStorage() {
 }
 
 // ==========================================
-// GALLERY LOGIC
+// GALLERY LOGIC (FIXED)
 // ==========================================
 function openGallery() {
   document.getElementById("galleryModal").style.display = "flex";
@@ -909,19 +909,25 @@ function renderGallery() {
   });
 }
 
+// FIXED FUNCTION: Trigger file input FIRST to maintain user activation
 function triggerGalleryUpload() {
-  const t = i18n[currentLang];
-  const title = prompt(t.promptTitle);
-  if (!title) return;
-
   const input = document.createElement("input");
   input.type = "file";
   input.accept = "image/*";
   input.setAttribute("capture", "environment");
 
+  // 1. Open file picker IMMEDIATELY (keeps user activation)
+  input.click();
+
+  // 2. Handle file selection AFTER the dialog closes
   input.onchange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    // Ask for title AFTER file is selected
+    const t = i18n[currentLang];
+    const title = prompt(t.promptTitle);
+    if (!title) return;
 
     const reader = new FileReader();
     reader.onload = (ev) => {
@@ -950,7 +956,6 @@ function triggerGalleryUpload() {
     };
     reader.readAsDataURL(file);
   };
-  input.click();
 }
 
 function viewImage(id) {
@@ -1495,9 +1500,8 @@ function init() {
   renderAdhoc();
   slApplyLabels();
   tick();
-
-  const firstSec = document.getElementById("sec0");
-  if (firstSec) firstSec.classList.add("open");
+  
+  // REMOVED the auto-open section code here so it starts minimized.
 }
 
 init();
