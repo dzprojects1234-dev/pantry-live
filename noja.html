@@ -166,6 +166,22 @@
     body.sl-printing .sl-ph-badge { background: #eee !important; border: 1px solid #999; }
     @page { margin: 12mm; }
   }
+  /* Toast notification */
+  #slToast {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--accent); color: #0f172a; padding: 12px 24px; border-radius: 10px;
+    font-weight: 700; font-size: 0.95rem; box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    opacity: 0; pointer-events: none; transition: opacity 0.25s, transform 0.25s;
+    z-index: 200; white-space: nowrap;
+  }
+  #slToast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  #slToast.error { background: var(--danger); color: white; }
+
+  /* Hide edit/delete columns when printing */
+  @media print {
+    body.sl-printing #shiftLogTable th:nth-last-child(-n+2),
+    body.sl-printing #shiftLogTable td:nth-last-child(-n+2) { display: none !important; }
+  }
 </style>
 </head>
 <body>
@@ -239,6 +255,7 @@
 </div>
 
 <!-- ==== SHIFT LOG MODAL — START ==== -->
+<div id="slToast"></div>
 <div id="shiftLogModal" class="modal">
   <div class="modal-header">
     <h2 id="shiftLogTitleEl">📅 Log Syif</h2>
@@ -1284,6 +1301,43 @@ function shiftLogCSV() {
   a.click();
   URL.revokeObjectURL(url);
 }
+function slToast(msg, isError) {
+  const el = document.getElementById("slToast");
+  if (!el) return;
+  el.textContent = msg;
+  el.className = "show" + (isError ? " error" : "");
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.className = ""; }, 2200);
+}
+
+function shiftLogDelete(id) {
+  if (!confirm(i18n[currentLang].confirmDelEntry)) return;
+  const removed = shiftLogData.find(e => e.id === id);
+  shiftLogData = shiftLogData.filter(e => e.id !== id);
+  slSaveStorage();
+  renderShiftLog();
+  slToast("🗑️ Deleted: " + (removed ? slISOtoDisplay(removed.date) : "entry"), true);
+}
+
+// Tambah toast notification pada fungsi Save Entry
+const originalSave = shiftLogSaveEntry;
+shiftLogSaveEntry = function() {
+  const date = document.getElementById("slDate").value;
+  const start = document.getElementById("slStart").value;
+  const end = document.getElementById("slEnd").value;
+  const ot = parseFloat(document.getElementById("slOT").value) || 0;
+  
+  if (!date || !start || !end) {
+    alert(i18n[currentLang].fillRequired);
+    return;
+  }
+  
+  const wasEditing = !!slEditId;
+  originalSave(); // Panggil fungsi asal kau
+  
+  const total = (slHours(start, end) + ot).toFixed(2);
+  slToast((wasEditing ? "✏️ Updated: " : "✅ Saved: ") + slISOtoDisplay(date) + " · " + total + "h");
+};
 
 function shiftLogExportJSON() {
   const year = slViewDate.getFullYear();
