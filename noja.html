@@ -1,3 +1,330 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Noja Masjid App</title>
+<style>
+  :root {
+    --bg: #0f172a; --card: #1e293b; --accent: #22c55e; --accent2: #38bdf8;
+    --text: #e2e8f0; --muted: #94a3b8; --warn: #f59e0b; --danger: #ef4444;
+    --border: #334155; --input-bg: #0b1220;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg); color: var(--text); padding: 16px; padding-bottom: 120px;
+    line-height: 1.5;
+  }
+
+  /* Top Bar */
+  .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px; }
+  .btn-group { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .btn-lang, .btn-tool {
+    background: var(--border); color: var(--text); border: none;
+    padding: 6px 12px; border-radius: 6px; font-weight: 700;
+    font-size: 0.8rem; cursor: pointer; width: auto;
+  }
+  .btn-lang { background: var(--accent2); color: #0f172a; }
+  .btn-gallery { background: #8b5cf6; color: white; }
+  .btn-log { background: #f97316; color: white; }
+
+  /* Shift Toggle */
+  .shift-toggle { display: flex; gap: 10px; margin-bottom: 12px; justify-content: center; }
+  .shift-btn {
+    background: var(--card); border: 2px solid var(--border); color: var(--text);
+    padding: 10px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.2s;
+  }
+  .shift-btn.active { background: var(--accent2); color: #0f172a; border-color: var(--accent2); }
+
+  header {
+    text-align: center; margin-bottom: 20px; padding: 16px;
+    background: linear-gradient(135deg, #166534, #065f46); border-radius: 16px;
+  }
+  header h1 { margin: 0; font-size: 1.3rem; }
+  header p { margin: 6px 0 0; color: #bbf7d0; font-size: 0.85rem; }
+  .date-display { font-size: 0.95rem; font-weight: bold; color: #fff; margin-top: 8px; }
+  .clock { font-size: 1.5rem; font-weight: 700; margin-top: 4px; color: #fff; font-variant-numeric: tabular-nums; }
+
+  /* Progress */
+  .progress-wrap { position: sticky; top: 0; z-index: 10; background: var(--bg); padding: 10px 0; margin-bottom: 8px; }
+  .progress-bar { height: 10px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 99px; transition: width 0.3s; }
+  .progress-text { text-align: center; font-size: 0.8rem; color: var(--muted); margin-top: 6px; }
+
+  /* Sections */
+  .section { background: var(--card); border-radius: 14px; margin-bottom: 14px; overflow: hidden; border: 1px solid var(--border); }
+  .section-head { display: flex; align-items: center; gap: 10px; padding: 14px 16px; cursor: pointer; user-select: none; background: #243447; flex-wrap: wrap; }
+  .section-head .time { background: var(--accent2); color: #0f172a; font-weight: 700; font-size: 0.72rem; padding: 3px 8px; border-radius: 6px; white-space: nowrap; }
+  .section-head h2 { margin: 0; font-size: 0.95rem; flex: 1; }
+  .section-head .arrow { transition: transform 0.25s; color: var(--muted); }
+  .section.open .arrow { transform: rotate(90deg); }
+  .section-body { display: none; padding: 6px 16px 14px; }
+  .section.open .section-body { display: block; }
+
+  /* Tasks */
+  .task { display: flex; gap: 10px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid #2d3b4f; }
+  .task:last-child { border-bottom: none; }
+  .task input[type="checkbox"] {
+    appearance: none; width: 22px; height: 22px; min-width: 22px;
+    border: 2px solid var(--muted); border-radius: 6px; margin-top: 2px;
+    cursor: pointer; position: relative; transition: 0.2s;
+  }
+  .task input[type="checkbox"]:checked { background: var(--accent); border-color: var(--accent); }
+  .task input[type="checkbox"]:checked::after { content: "✓"; position: absolute; color: #0f172a; font-weight: 900; font-size: 15px; left: 4px; top: -2px; }
+  .task label { flex: 1; font-size: 0.95rem; cursor: pointer; }
+  .task input:checked + label { color: var(--muted); text-decoration: line-through; }
+  .note { font-size: 0.8rem; color: var(--warn); margin-top: 4px; display: block; }
+
+  /* Edit Mode */
+  .edit-input { width: 100%; padding: 8px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text); border-radius: 6px; font-family: inherit; margin-bottom: 4px; }
+  .btn-sm { padding: 6px 10px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; border: none; font-weight: bold; }
+  .btn-delete { background: var(--danger); color: white; margin-left: 8px; }
+  .btn-add { background: var(--accent); color: #0f172a; margin-top: 10px; width: 100%; }
+  .btn-del-sec { background: transparent; color: var(--danger); border: 1px solid var(--danger); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; margin-left: auto; }
+  .btn-check-all { background: var(--accent2); color: #0f172a; margin-bottom: 8px; width: 100%; padding: 8px; border-radius: 6px; font-weight: bold; border: none; cursor: pointer; }
+
+  /* Adhoc Grid & Notes */
+  .adhoc-section { margin-top: 24px; }
+  .adhoc-section h3 { margin-bottom: 12px; font-size: 1.05rem; color: var(--accent2); }
+  .adhoc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+  .adhoc-card { background: var(--card); padding: 12px; border-radius: 12px; border: 1px solid var(--border); }
+  .adhoc-card h4 { margin: 0 0 8px 0; font-size: 0.95rem; color: var(--text); }
+  .adhoc-textarea { width: 100%; min-height: 80px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 10px; font-family: inherit; resize: vertical; }
+  .notes-section { background: var(--card); padding: 16px; border-radius: 14px; border: 1px solid var(--border); margin-top: 24px; }
+  .notes-section h3 { margin: 0 0 10px 0; font-size: 1.05rem; color: var(--accent2); }
+  .notes-textarea { width: 100%; min-height: 100px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 12px; font-family: inherit; resize: vertical; }
+
+  /* Footer */
+  footer { position: fixed; bottom: 0; left: 0; right: 0; background: #0b1220; padding: 12px 16px; display: flex; gap: 10px; border-top: 1px solid var(--border); z-index: 20; flex-wrap: wrap; }
+  button.main-btn { flex: 1; padding: 12px; border: none; border-radius: 10px; font-weight: 600; font-size: 0.9rem; cursor: pointer; background: var(--border); color: var(--text); transition: 0.2s; }
+  button.main-btn:active { opacity: 0.8; }
+  .btn-primary { background: var(--accent2) !important; color: #0f172a !important; }
+  .btn-danger { background: var(--danger) !important; color: white !important; }
+  .badge-done { font-size: 0.7rem; background: var(--accent); color: #0f172a; padding: 2px 6px; border-radius: 5px; font-weight: 700; display: none; }
+  .section.complete .badge-done { display: inline-block; }
+
+  /* MODAL */
+  .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; flex-direction: column; }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 16px; background: var(--card); border-bottom: 1px solid var(--border); }
+  .modal-header h2 { margin: 0; font-size: 1.2rem; }
+  .modal-body { padding: 16px; overflow-y: auto; flex: 1; }
+  .btn-close { background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+
+  /* Gallery Grid */
+  .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+  .gallery-item { background: var(--card); border-radius: 10px; overflow: hidden; border: 1px solid var(--border); display: flex; flex-direction: column; }
+  .gallery-item img { width: 100%; height: 120px; object-fit: cover; cursor: pointer; }
+  .gallery-item-info { padding: 8px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+  .gallery-item-title { font-size: 0.85rem; font-weight: bold; margin-bottom: 8px; word-wrap: break-word; }
+  .gallery-item-actions { display: flex; gap: 6px; }
+  .gallery-item-actions button { flex: 1; font-size: 0.7rem; padding: 4px; }
+
+  /* ==== SHIFT LOG ==== */
+  #shiftLogTable { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  #shiftLogTable th, #shiftLogTable td {
+    padding: 8px 6px; border-bottom: 1px solid var(--border); text-align: left;
+    vertical-align: top; white-space: nowrap;
+  }
+  #shiftLogTable th {
+    background: #243447; font-size: 0.72rem; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.03em;
+  }
+  #shiftLogTable tr:hover td { background: #1a2538; }
+  #shiftLogTable td.notes-cell { white-space: normal; max-width: 180px; font-size: 0.78rem; color: var(--muted); }
+  #shiftLogTable td.num { font-variant-numeric: tabular-nums; text-align: right; }
+  .sl-ph-badge { display:inline-block; font-size:0.65rem; background:var(--warn); color:#0f172a; padding:1px 5px; border-radius:4px; font-weight:700; }
+  .sl-overnight { color: var(--accent2); font-size: 0.7rem; }
+  .sl-summary-row { display:flex; justify-content:space-between; padding:3px 0; font-size:0.88rem; }
+  .sl-summary-row.total { border-top:1px solid var(--border); margin-top:8px; padding-top:8px; font-weight:bold; color:var(--accent); font-size:1rem; }
+  .sl-summary-row .val { font-variant-numeric: tabular-nums; }
+
+  /* Print */
+  @media print {
+    body { background: white; color: black; padding: 0; }
+    header, .progress-wrap, footer, .top-bar, .adhoc-section, .notes-section, .btn-sm, .btn-delete, .btn-add, .btn-del-sec, .arrow, .shift-toggle, .btn-check-all { display: none !important; }
+    .section { border: 1px solid #ccc; page-break-inside: avoid; margin-bottom: 15px; background: white; }
+    .section-head { background: #eee !important; color: black; }
+    .section-body { display: block !important; }
+    .task label { color: black !important; text-decoration: none !important; }
+    .note { color: #555 !important; }
+    input[type="checkbox"] { border: 2px solid black !important; }
+    input[type="checkbox"]:checked::after { color: black !important; }
+
+    /* Shift Log print mode */
+    body.sl-printing > *:not(#shiftLogModal) { display: none !important; }
+    body.sl-printing #shiftLogModal { display: block !important; position: static; background: white; padding: 16px; }
+    body.sl-printing #shiftLogModal .modal-header .btn-close,
+    body.sl-printing #shiftLogModal .btn-tool,
+    body.sl-printing #shiftLogModal #shiftLogForm { display: none !important; }
+    body.sl-printing #shiftLogModal * { color: black !important; }
+    body.sl-printing #shiftLogTable th { background: #eee !important; }
+    body.sl-printing #shiftLogTable td,
+    body.sl-printing #shiftLogTable th { border: 1px solid #ccc !important; }
+    body.sl-printing #shiftLogSummary { border: 1px solid #ccc; }
+    body.sl-printing .sl-summary-row.total { color: black; }
+    body.sl-printing .sl-ph-badge { background: #eee !important; border: 1px solid #999; }
+    @page { margin: 12mm; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div style="font-weight: bold; font-size: 1.1rem;">🕌 Noja Masjid</div>
+  <div class="btn-group">
+    <button class="btn-tool btn-log" id="btnShiftLog" onclick="openShiftLog()">📅 Log Syif</button>
+    <button class="btn-tool btn-gallery" id="btnGallery" onclick="openGallery()">📸 Galeri Rujukan</button>
+    <button class="btn-tool" id="btnBackup" onclick="backupJSON()" title="Backup">📥 Backup</button>
+    <button class="btn-tool" id="btnRestore" onclick="document.getElementById('restoreFile').click()" title="Restore">📤 Restore</button>
+    <button class="btn-tool" id="btnPrint" onclick="window.print()" title="Print PDF">🖨️ Print</button>
+    <button class="btn-lang" id="langBtn" onclick="toggleLang()">EN</button>
+  </div>
+  <input type="file" id="restoreFile" accept=".json" style="display:none" onchange="restoreJSON(this)">
+</div>
+
+<!-- Shift Toggle -->
+<div class="shift-toggle">
+  <button class="shift-btn active" id="shiftMorningBtn" onclick="setShift('morning')">🌅 Shift Pagi</button>
+  <button class="shift-btn" id="shiftEveningBtn" onclick="setShift('evening')">🌙 Shift Petang</button>
+</div>
+
+<header>
+  <h1 id="title">Prosedur Kerja Noja Masjid</h1>
+  <p id="subtitle">Rutin Harian · 4.30 pagi – 9.00 pagi</p>
+  <div class="date-display" id="dateDisplay">--</div>
+  <div class="clock" id="clock">--:--:--</div>
+</header>
+
+<div class="progress-wrap">
+  <div class="progress-bar"><div class="progress-fill" id="fill"></div></div>
+  <div class="progress-text" id="progressText">0 / 0 selesai</div>
+</div>
+
+<div id="sections"></div>
+
+<!-- ⏸️ END OF PART 1 — PASTE PART 2 IMMEDIATELY BELOW THIS LINE -->
+
+<div class="adhoc-section">
+  <h3 id="adhocTitle">📌 Tugasan Mingguan</h3>
+  <div class="adhoc-grid" id="adhocGrid"></div>
+</div>
+
+<div class="notes-section">
+  <h3 id="notesTitle">📝 Nota Peribadi</h3>
+  <textarea class="notes-textarea" id="mainNotes" placeholder="Tulis nota di sini..."></textarea>
+</div>
+
+<footer>
+  <button class="main-btn" id="btnExpand" onclick="expandAll()">Buka Semua</button>
+  <button class="main-btn btn-primary" id="btnEdit" onclick="toggleEditMode()">✏️ Edit</button>
+  <button class="main-btn btn-danger" id="btnReset" onclick="resetAll()">Reset</button>
+</footer>
+
+<!-- Gallery Modal -->
+<div id="galleryModal" class="modal">
+  <div class="modal-header">
+    <h2 id="galleryTitle">📸 Galeri Rujukan</h2>
+    <button class="btn-close" id="btnCloseGallery" onclick="closeGallery()">Tutup</button>
+  </div>
+  <div class="modal-body">
+    <button class="btn-tool btn-primary" id="btnAddGallery" style="width: 100%; margin-bottom: 16px; padding: 12px; font-size: 1rem;" onclick="triggerGalleryUpload()">+ Tambah Gambar Baru</button>
+    <div class="gallery-grid" id="galleryGrid"></div>
+  </div>
+</div>
+
+<!-- Full Image Viewer -->
+<div id="imgModal" class="modal" style="justify-content: center; align-items: center; background: rgba(0,0,0,0.95);" onclick="if(event.target===this) this.style.display='none'">
+  <img id="imgModalSrc" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+</div>
+
+<!-- ==== SHIFT LOG MODAL — START ==== -->
+<div id="shiftLogModal" class="modal">
+  <div class="modal-header">
+    <h2 id="shiftLogTitleEl">📅 Log Syif</h2>
+    <button class="btn-close" onclick="closeShiftLog()">✖</button>
+  </div>
+  <div class="modal-body">
+
+    <!-- Month navigator -->
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px;">
+      <button class="btn-tool" id="btnPrevMonth" onclick="shiftLogPrevMonth()" style="font-size:1rem; padding:8px 14px;">◀</button>
+      <div id="shiftLogMonthLabel" style="font-weight:bold; font-size:1.05rem; text-align:center; flex:1;"></div>
+      <button class="btn-tool" id="btnNextMonth" onclick="shiftLogNextMonth()" style="font-size:1rem; padding:8px 14px;">▶</button>
+    </div>
+
+    <!-- Add / Edit form -->
+    <div id="shiftLogForm" style="background:var(--input-bg); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:14px;">
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px,1fr)); gap:8px;">
+        <div>
+          <label style="font-size:0.75rem; color:var(--muted);" id="lblDate">Tarikh</label>
+          <input type="date" id="slDate" class="edit-input" style="margin-bottom:0;">
+        </div>
+        <div>
+          <label style="font-size:0.75rem; color:var(--muted);" id="lblType">Jenis Syif</label>
+          <select id="slType" class="edit-input" style="margin-bottom:0;" onchange="shiftLogOnTypeChange()">
+            <option value="morning">Pagi</option>
+            <option value="evening" selected>Petang</option>
+            <option value="adhoc">Adhoc</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:0.75rem; color:var(--muted);" id="lblStart">Mula</label>
+          <input type="time" id="slStart" class="edit-input" style="margin-bottom:0;" value="17:30">
+        </div>
+        <div>
+          <label style="font-size:0.75rem; color:var(--muted);" id="lblEnd">Tamat</label>
+          <input type="time" id="slEnd" class="edit-input" style="margin-bottom:0;" value="22:30">
+        </div>
+        <div>
+          <label style="font-size:0.75rem; color:var(--muted);" id="lblOT">OT (jam)</label>
+          <input type="number" id="slOT" class="edit-input" style="margin-bottom:0;" min="0" step="0.25" value="0">
+        </div>
+        <div style="display:flex; align-items:flex-end; padding-bottom:4px;">
+          <label style="display:flex; align-items:center; gap:6px; font-size:0.85rem;">
+            <input type="checkbox" id="slPH" style="width:18px; height:18px;">
+            <span id="lblPH">Cuti Umum</span>
+          </label>
+        </div>
+      </div>
+      <div style="margin-top:8px;">
+        <label style="font-size:0.75rem; color:var(--muted);" id="lblReason">Sebab</label>
+        <input type="text" id="slReason" class="edit-input" style="margin-bottom:0;" placeholder="">
+      </div>
+      <div style="margin-top:8px;">
+        <label style="font-size:0.75rem; color:var(--muted);" id="lblNotes">Nota</label>
+        <input type="text" id="slNotes" class="edit-input" style="margin-bottom:0;" placeholder="">
+      </div>
+      <div style="display:flex; gap:8px; margin-top:10px;">
+        <button class="btn-sm" style="flex:1; background:var(--accent); color:#0f172a; padding:10px; font-size:0.9rem;" id="btnSaveEntry" onclick="shiftLogSaveEntry()">💾 Simpan</button>
+        <button class="btn-sm" style="flex:1; background:var(--border); color:var(--text); padding:10px; font-size:0.9rem; display:none;" id="btnCancelEdit" onclick="shiftLogCancelEdit()">✖ Batal</button>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div style="overflow-x:auto; margin-bottom:14px;">
+      <table id="shiftLogTable">
+        <thead id="shiftLogThead"></thead>
+        <tbody id="shiftLogTbody"></tbody>
+      </table>
+    </div>
+
+    <!-- Summary -->
+    <div id="shiftLogSummary" style="background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px; margin-bottom:14px;"></div>
+
+    <!-- Export bar -->
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <button class="btn-tool btn-primary" style="flex:1; padding:10px;" onclick="shiftLogPrint()" id="btnLogPrint">🖨️ Print / PDF</button>
+      <button class="btn-tool" style="flex:1; padding:10px;" onclick="shiftLogCSV()" id="btnLogCSV">📄 CSV</button>
+      <button class="btn-tool" style="flex:1; padding:10px;" onclick="shiftLogExportJSON()" id="btnLogExport">📥 Export Log JSON</button>
+    </div>
+
+  </div>
+</div>
+<!-- ==== SHIFT LOG MODAL — END ==== -->
+
+<!-- ⏸️ END OF PART 2 — PASTE PART 3 IMMEDIATELY BELOW THIS LINE -->
+
 <script>
 // ==========================================
 // TRANSLATIONS (LANGUAGE DICTIONARY)
