@@ -2,16 +2,14 @@ name: Keep Supabase Active
 
 on:
   schedule:
-    # Berjalan setiap 3 hari sekali pada jam 2:17 pagi (Waktu UTC)
-    # Kita elak minit '0' supaya GitHub tak delay/cancel sebab ramai orang guna pada minit yang sama
     - cron: '17 2 */3 * *'
-  workflow_dispatch: # Supaya anda boleh test manually (tekan butang 'Run workflow')
+  workflow_dispatch:
 
 jobs:
   ping-supabase:
     runs-on: ubuntu-latest
     steps:
-        - name: Insert Keep-Alive Log into Supabase
+      - name: Insert Keep-Alive Log into Supabase
         run: |
           curl -X POST "${{ secrets.SUPABASE_URL }}/rest/v1/keep_alive_logs" \
           -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
